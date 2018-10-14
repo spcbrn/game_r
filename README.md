@@ -1,7 +1,7 @@
 # Game Design using HTML Canvas and React
 
 
-This project is designed to test your understanding of Javascript, React and general programmatic logic.
+This project is designed to accompany a talk and demonstrate the basic principles of game development using canvas and react.
 
 ## Table of Contents
 
