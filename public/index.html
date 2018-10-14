@@ -1,40 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#000000">
-    <!--
-      manifest.json provides metadata used when your web app is added to the
-      homescreen on Android. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<html>
+    <head>
+        <title>Game Design Using Canvas and React</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <style>
+            body
+            {
+                background-color:#000;
+            }
+            
+            #talkWrapper
+            {
+                position: relative;
+            }
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>
-      You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+            #theTalk
+            {
+                width:1280px;
+                height:1024px;
+                padding: 0px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin: 0px 0 0 -640px;
+                overflow:hidden;
+            }
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+            #talkFrame
+            {
+              width:1280px;
+              height:1024px;
+              padding: 0px;
+              overflow:hidden;
+              border:0;
+            }
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+            #controlPanel
+            {
+              position: absolute;
+              top:0px;
+              left:0px;
+              background-color:rgb(172,187,187);opacity:0.99;
+              width:205px;
+              height:1024px;
+              padding: 0px;
+              overflow:hidden;
+              border:0;
+            }
+
+            .button {
+                background-color: rgb(0,128,136);opacity:0.75;
+                border: none;
+                border-radius: 8px;
+                color: white;
+                padding: 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                width:75%;
+            }
+
+            .button.active {
+                background-color: rgb(0,128,136);opacity:1;
+                border: none;
+                border-radius: 8px;
+                color: white;
+                padding: 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                width:75%;
+            }
+
+            ul{
+              list-style-type:none;
+              padding:0px;
+              margin:0px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="talkWrapper">
+            <div id="theTalk"><iframe id="talkFrame"></iframe></div>
+            <div id="controlPanel">
+              <ul>
+                  <li><a id="btn_intro" href="Javascript: loadTemplate('intro');" class="button">Intro</a></li>
+                  <li><a id="btn_slides1" href="Javascript: loadTemplate('slides',1);" class="button">Slides 1</a></li>
+                  <li><a id="btn_game1" href="Javascript: loadTemplate('game',1);" class="button">Game Loader 1</a></li>
+                  <li><a id="btn_quiz1" href="Javascript: loadTemplate('quiz',1);" class="button">Quiz 1</a></li>
+                  <li><a id="btn_slides2" href="Javascript: loadTemplate('slides',2);" class="button">Slides 2</a></li>
+                  <li><a id="btn_game2" href="Javascript: loadTemplate('game',2);" class="button">Game Loader 2</a></li>
+                  <li><a id="btn_quiz2" href="Javascript: loadTemplate('quiz',2);" class="button">Quiz 2</a></li>
+              </ul>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/theTalk.js"></script>
+    </body>
 </html>
