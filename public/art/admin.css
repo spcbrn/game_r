@@ -1,0 +1,23 @@
+#theTalk
+{
+    width:1280px;
+    height:1024px;
+    padding: 0px;
+    position: absolute;
+    top: 0;
+    left: 275px;
+    margin:0;
+}
+
+#controlPanelFrame
+{
+    position: absolute;
+    top:0px;
+    left:0px;
+    background-color:rgb(172,187,187);opacity:0.99;
+    width:175px;
+    height:1024px;
+    padding: 0px;
+    overflow:hidden;
+    border:0;
+}

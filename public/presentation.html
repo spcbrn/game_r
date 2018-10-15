@@ -1,103 +1,25 @@
 <html>
     <head>
-        <title>Game Design Using Canvas and React</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript">document.domain = "suralink.com";</script>
         <style>
             body
             {
                 background-color:#000;
+                background-image:url("art/largebg.jpg");
+                background-repeat:no-repeat;
             }
-            
-            #talkWrapper
-            {
-                position: relative;
-            }
-
-            #theTalk
-            {
-                width:1280px;
-                height:1024px;
-                padding: 0px;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                margin: 0px 0 0 -640px;
-                overflow:hidden;
-            }
-
-            #talkFrame
-            {
-              width:1280px;
-              height:1024px;
-              padding: 0px;
-              overflow:hidden;
-              border:0;
-            }
-
-            #controlPanel
-            {
-              position: absolute;
-              top:0px;
-              left:0px;
-              background-color:rgb(172,187,187);opacity:0.99;
-              width:205px;
-              height:1024px;
-              padding: 0px;
-              overflow:hidden;
-              border:0;
-            }
-
-            .button {
-                background-color: rgb(0,128,136);opacity:0.75;
-                border: none;
-                border-radius: 8px;
-                color: white;
-                padding: 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                width:75%;
-            }
-
-            .button.active {
-                background-color: rgb(0,128,136);opacity:1;
-                border: none;
-                border-radius: 8px;
-                color: white;
-                padding: 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                width:75%;
-            }
-
-            ul{
-              list-style-type:none;
-              padding:0px;
-              margin:0px;
-            }
-
         </style>
+        <title>Game Design Using Canvas and React</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="art/presentation.css">
+        <link rel="stylesheet" type="text/css" href="art/admin.css">
     </head>
     <body>
         <div id="talkWrapper">
             <div id="theTalk"><iframe id="talkFrame"></iframe></div>
-            <div id="controlPanel">
-              <ul>
-                  <li><a id="btn_intro" href="Javascript: loadTemplate('intro');" class="button">Intro</a></li>
-                  <li><a id="btn_slides1" href="Javascript: loadTemplate('slides',1);" class="button">Slides 1</a></li>
-                  <li><a id="btn_game1" href="Javascript: loadTemplate('game',1);" class="button">Game Loader 1</a></li>
-                  <li><a id="btn_quiz1" href="Javascript: loadTemplate('quiz',1);" class="button">Quiz 1</a></li>
-                  <li><a id="btn_slides2" href="Javascript: loadTemplate('slides',2);" class="button">Slides 2</a></li>
-                  <li><a id="btn_game2" href="Javascript: loadTemplate('game',2);" class="button">Game Loader 2</a></li>
-                  <li><a id="btn_quiz2" href="Javascript: loadTemplate('quiz',2);" class="button">Quiz 2</a></li>
-              </ul>
-            </div>
+            <div id="controlContainer" style="display:none;"><iframe id="controlPanelFrame"></iframe></div>
         </div>
+        <script type="text/javascript" src="js/common.js"></script>
         <script type="text/javascript" src="js/theTalk.js"></script>
     </body>
 </html>
