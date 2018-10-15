@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 
+const ssUrl = require('./../art/spritesheet.png');
+const spriteSheet = new Image();
+spriteSheet.src = ssUrl;
+
 class GameCanvas extends Component {
    constructor() {
       super();
@@ -10,6 +14,12 @@ class GameCanvas extends Component {
       this.ctx = this.canvas.getContext('2d');
 
       this.gridHash = this._initGrid({ rows: 12, cols: 16, t_width: 800, t_height: 600 });
+
+      this.canvas.addEventListener('click', e => {
+         let gCoords = { x: Math.ceil((e.clientX - 240) / 50), y: Math.ceil((e.clientY - 212) / 50) };
+         let gridKey = `${gCoords.x}-${gCoords.y}`;
+         console.log(`Clicked on grid tile ${gridKey}`);
+      })
 
       this._renderLoop();
    }
@@ -24,13 +34,19 @@ class GameCanvas extends Component {
       this._drawGrid();
    }
 
-   _drawBox = box => {
-      // box.color = randomHex();
-      this.ctx.fillStyle = box.color;
-      this.ctx.fillRect(box.x, box.y, box.width, box.height)
+   _drawBox = (type, box) => {
+      if (!box) return;
+
+      if (type === 'grid') {
+         this.ctx.fillRect(box.x, box.y, box.width, box.height);
+         this.ctx.drawImage(spriteSheet, box.sprite.x, box.sprite.y, box.sprite.width, box.sprite.height, box.x, box.y, box.width, box.height);
+      } else {
+         this.ctx.fillStyle = box.color;
+         this.ctx.fillRect(box.x, box.y, box.width, box.height);
+      }
    }
 
-   _drawGrid = () => { for (let coords in this.gridHash) this._drawBox(this.gridHash[coords]) }
+   _drawGrid = () => { for (let coords in this.gridHash) this._drawBox('grid', this.gridHash[coords]) }
 
    _initGrid = ({ rows, cols, t_width, t_height }) => {
       let width = t_width / cols;
@@ -39,13 +55,18 @@ class GameCanvas extends Component {
 
       for (let i = 0; i <= rows; i++) {
          for (let j = 0; j <= cols; j++) {
-            let gX = i, gY = j,
+            let key = `${i}-${j}`,
+               gX = i, gY = j,
                x = (j * width),
                y = (i * height),
-               typeConfig = gridTypes[randomGridConst[(Math.floor(Math.random() * 20) + 1)]];
+               gridTypeConfig = grid.gridTypes[grid._getRandomConstant()];
 
-            gridHash[`${i}-${j}`] = new this.GameClasses.GridBox({ gX, gY, x, y, width, height, ...typeConfig })
+            let el = document.createElement('area');
+            el.coords = `${x},${x + 50},${y},${y + 50}`
+            el.href = 'Javascript:console.log("whaaa")';
+            document.body.append(el);
 
+            gridHash[key] = new this.GameClasses.GridBox({ gX, gY, x, y, width, height, ...gridTypeConfig })
          }
       }
       console.log(gridHash)
@@ -81,31 +102,69 @@ class GameCanvas extends Component {
    }))()
 
    render() {
-      return (
+      return (<>
          <canvas
             id="g_canvas"
             ref="g_canvas"
             width="800"
             height="600"
          />
-      );
+      </>);
    }
 }
 
-const randomGridConst = [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const gridTypes = {
-   0: { type: 0, passable: true, friction: 0, damage: 0, color: '#f2f2f2', sprite: '...' },
-   1: { type: 1, passable: false, friction: 0, damage: 0, color: '#8f9191', sprite: '...' },
-   2: { type: 2, passable: true, friction: 1, damage: 0, color: '#6ce4fc', sprite: '...' }
-}
-
 const randomHex = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+const randInt = n => (Math.floor(Math.random() * n) + 1);
+
+const grid = {
+   _getRandomConstant: () => ([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0][(Math.floor(Math.random() * (20 - 1)) + 1)]),
+   gridTypes: {
+      0: {
+         type: 'walkable',
+         const: 0,
+         passable: true,
+         friction: 0,
+         damage: 0,
+         color: '#d2d2d2',
+         sprite: [{ x: 0, y: 0, width: 50, height: 50, type: 0 }, { x: 0, y: 50, width: 50, height: 50, type: 0 }, { x: 0, y: 100, width: 50, height: 50, type: 0 }][randInt(3) - 1]
+      },
+      1: {
+         type: 'walkableSlow',
+         const: 1,
+         passable: true,
+         friction: Number((Math.random() * (.8 - .3) + .3).toFixed(2)),
+         damage: 0,
+         color: '#80cccc',
+         sprite: [{ x: 100, y: 0, width: 50, height: 50, type: 1 }, { x: 100, y: 50, width: 50, height: 50, type: 1 }, { x: 100, y: 100, width: 50, height: 50, type: 1 }][randInt(3) - 1]
+      },
+      2: {
+         type: 'blocked',
+         const: 2,
+         passable: false,
+         friction: 0,
+         damage: 0,
+         color: '#7a7a7a',
+         sprite: [{ x: 50, y: 0, width: 50, height: 50, type: 2 }, { x: 50, y: 50, width: 50, height: 50, type: 2 }, { x: 50, y: 100, width: 50, height: 50, type: 2 }][randInt(3) - 1]
+      },
+      3: {
+         type: 'damage',
+         passable: true,
+         const: 3,
+         friction: Number((Math.random() * (.8 - .3) + .3).toFixed(2)),
+         damage: Number((Math.random() * (.75 - .25) + .25).toFixed(2)),
+         color: '#c4341b',
+         sprite: [{ x: 150, y: 0, width: 50, height: 50, type: 3 }, { x: 150, y: 50, width: 50, height: 50, type: 3 }, { x: 150, y: 100, width: 50, height: 50, type: 3 }][randInt(3) - 1]
+      }
+   }
+}
 
 export default GameCanvas;
 
-levelSprites = {
+let levelSprites = {
    walkable: { zones: [{ x: 0, y: 0, width: 50, height: 50, type: 0 }, { x: 0, y: 50, width: 50, height: 50, type: 0 }, { x: 0, y: 100, width: 50, height: 50, type: 0 }] },
    walkableSlow: { zones: [{ x: 100, y: 0, width: 50, height: 50, type: 2, slow: 0.25 }, { x: 100, y: 50, width: 50, height: 50, type: 2, slow: 0.50 }, { x: 100, y: 100, width: 50, height: 50, type: 2, slow: 0.75 }] },
    blocked: { zones: [{ x: 50, y: 0, width: 50, height: 50, type: 1 }, { x: 50, y: 50, width: 50, height: 50, type: 1 }, { x: 50, y: 100, width: 50, height: 50, type: 1 }] },
    damage: { zones: [{ x: 200, y: 0, width: 50, height: 50, type: 4, slow: 0.75, damage: 0.25 }, { x: 200, y: 50, width: 50, height: 50, slow: 0.35, damage: 0.50, type: 4 }, { x: 200, y: 100, width: 50, height: 50, slow: 0.55, damage: 0.75, type: 4 }] }
-} 
+}
+
+let hero = { down: { x: 0, y: 0, width: 56, height: 72 }, up: { x: 0, y: 74, width: 53, height: 72 }, left: { x: 0, y: 146, width: 53, height: 72 }, right: { x: 0, y: 219, width: 53, height: 72 } }
