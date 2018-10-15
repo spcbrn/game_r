@@ -16,9 +16,10 @@ class GameCanvas extends Component {
       this.gridHash = this._initGrid({ rows: 12, cols: 16, t_width: 800, t_height: 600 });
 
       this.canvas.addEventListener('click', e => {
-         let gCoords = { x: Math.ceil((e.clientX - 240) / 50), y: Math.ceil((e.clientY - 212) / 50) };
+         let gCoords = { x: (Math.ceil((e.clientX - 240) / 50) - 1), y: (Math.ceil((e.clientY - 212) / 50) - 1) };
          let gridKey = `${gCoords.x}-${gCoords.y}`;
-         console.log(this.gridHash[gridKey]);
+         let boxClicked = this.gridHash[gridKey];
+         boxClicked._setDestination()
       })
 
       this._renderLoop();
@@ -53,57 +54,90 @@ class GameCanvas extends Component {
       let height = t_height / rows;
       let gridHash = {};
 
+      let startAssigned = false;
       for (let i = 0; i <= rows; i++) {
          for (let j = 0; j <= cols; j++) {
-            let key = `${i}-${j}`,
-               gX = i, gY = j,
+            let key = `${j}-${i}`,
+               gX = j, gY = i,
                x = (j * width),
                y = (i * height),
                gridTypeConfig = grid.gridTypes[grid._getRandomConstant()];
 
-            let el = document.createElement('area');
-            el.coords = `${x},${x + 50},${y},${y + 50}`
-            el.href = 'Javascript:console.log("whaaa")';
-            document.body.append(el);
+            let gridBox = new this.GameClasses.GridBox({ gX, gY, x, y, width, height, ...gridTypeConfig })
+            if (!startAssigned && (randInt(20) > 16)) {
+               this.heroPosition = gridBox;
+               gridBox._setSource();
+               startAssigned = true;
+               console.log(gridBox)
+            }
 
-            gridHash[key] = new this.GameClasses.GridBox({ gX, gY, x, y, width, height, ...gridTypeConfig })
+            gridHash[key] = gridBox;
          }
       }
       console.log(gridHash)
       return gridHash;
    }
 
-   GameClasses = (() => ({
-      GridBox: function GridBox({ gX, gY, x, y, width, height, type, passable, friction, damage, color, sprite }) {
-         this.gX = gX;
-         this.gY = gY;
-         this.x = x || 0;
-         this.y = y || 0;
-         this.width = width || 0;
-         this.height = height || 0;
+   GameClasses = (() => {
+      const that = this;
+      return {
+         GridBox: function GridBox({ gX, gY, x, y, width, height, type, passable, friction, damage, color, sprite }) {
+            this.gX = gX;
+            this.gY = gY;
+            this.x = x || 0;
+            this.y = y || 0;
+            this.width = width || 0;
+            this.height = height || 0;
 
-         this.type = type;
-         this.passable = passable;
-         this.friction = friction;
-         this.damage = damage;
-         this.color = color;
-         this.sprite = sprite;
+            this.type = type;
+            this.passable = passable;
+            this.friction = friction;
+            this.damage = damage;
+            this.color = color;
+            this.sprite = sprite;
 
-         this._getNeighbors = () => {
+            this.isSelected = false;
+            this._select = () => this.isSelected = true;
+            this._deselect = () => this.isSelected = false;
 
+            this.isSource = false;
+            this._setSource = () => this.isSource = true;
+            this._clearSource = () => this.isSource = false;
+
+            this.isDestination = false;
+            this._setDestination = () => this.isDestination = true;
+            this._setDestination = () => this.isDestination = false;
+
+            this._getScore = () => {
+
+            }
+            this._getNeighbors = () => {
+               let { gX, gY, x, y } = this;
+               let neighbors = [];
+               console.log(`${gX}-${gY}`)
+               
+               for (let i = gX - 1; i <= gX + 1; i++) {
+                  for (let j = gY - 1; j <= gY + 1; j++) {
+                     if ((i < 0 || j < 0 || i > 15 || j > 11) || (i === this.gX && j === this.gY)) continue;
+                     else neighbors.push(Object.assign({}, that.gridHash[`${i}-${j}`]))
+                  }
+               }
+               console.log(neighbors)
+               return neighbors
+            }
+         },
+         CharBox: function CharBox({ x, y, width, height, type, color, sprite }) {
+            this.x = x || 0;
+            this.y = y || 0;
+            this.width = width || 0;
+            this.height = height || 0;
+
+            this.type = type;
+            this.color = color;
+            this.sprit = sprite;
          }
-      },
-      CharBox: function CharBox({ x, y, width, height, type, color, sprite }) {
-         this.x = x || 0;
-         this.y = y || 0;
-         this.width = width || 0;
-         this.height = height || 0;
-
-         this.type = type;
-         this.color = color;
-         this.sprit = sprite;
       }
-   }))()
+   })()
 
    render() {
       return (<>
