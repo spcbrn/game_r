@@ -30,19 +30,19 @@ function loadTemplate(type,idx)
     switch(type)
     {
         case 'intro' :
-            $("#talkFrame").attr('src', "templates/"+states[currentState].template);
+            $("#talkFrame").attr('src', "templates/intro.html");
         break;
 
         case 'slides' :
-
+            $("#talkFrame").attr('src', "templates/slideViewer.html?idx="+idx);
         break;
 
         case 'game' :
-
+            $("#talkFrame").attr('src', "templates/gameLoader.html?idx="+idx);
         break;
 
         case 'quiz' :
-
+            $("#talkFrame").attr('src', "templates/quizSlide.html?idx="+idx);
         break;
     }
 }
