@@ -324,7 +324,7 @@ const grid = {
    }
 }
 
-const nDirections = { 0: 'NORTH_WEST', 3: 'NORTH', 6: 'NORTH_EAST', 1: 'WEST', 7: 'EAST', 2: 'SOUTH_WEST', 5: 'SOUTH', 8: 'SOUTH_EAST' };
+const nDirections = { 0: 'NORTH_WEST', 1: 'WEST', 2: 'SOUTH_WEST', 3: 'NORTH', 5: 'SOUTH', 6: 'NORTH_EAST', 7: 'EAST', 8: 'SOUTH_EAST' };
 
 export default GameCanvas;
 

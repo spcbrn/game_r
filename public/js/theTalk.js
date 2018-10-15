@@ -16,6 +16,7 @@ states[4] = {title:"Talk Slide",template:"slideViewer.html",slide:4};
 states[5] = {title:"Interactive",template:"gameLoader.html"};
 
 var currentState = 0;
+var admin = false;
 
 function  initTalk()
 {
@@ -23,6 +24,14 @@ function  initTalk()
     loadTemplate('intro');
 
     heartBeatTick();    
+
+    console.log("test:",$.urlParam('admin'));
+    if($.urlParam('admin'))
+    {
+        $("#controlPanelFrame").attr('src', "templates/controlPanel.html");
+        $("#controlContainer").show();
+        admin = true;
+    }
 }
 
 function loadTemplate(type,idx)
@@ -31,6 +40,7 @@ function loadTemplate(type,idx)
 
     currentState = {type:type,idx:idx};
 
+    var fail = false;
     switch(type)
     {
         case 'intro' :
@@ -48,20 +58,28 @@ function loadTemplate(type,idx)
         case 'quiz' :
             $("#talkFrame").attr('src', "templates/quizSlide.html?idx="+idx);
         break;
+
+        default: fail = true;
+    }
+
+    if(!fail && admin)
+    {
+        setState();
     }
 }
 
 function setState(type,idx)
 {
-    console.log(" setState");
+    console.log(" setState::: "+type+","+idx+" < ");
     $.ajax({
         type: "POST",
         url: "https://wwwforms.suralink.com/utahjs.php",
         data: {
             secret: 'utahJs',
             command: 'admin',
-            sKey: utahJs1234
-            state: {type:type,idx:idx}
+            adminCommand: 'setState',
+            sKey: 'utahJs1234',
+            state: currentState
         },
         success: function(data) 
         {
@@ -75,6 +93,34 @@ function setState(type,idx)
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) { if(XMLHttpRequest.status != 0) alert('error : heart beat. '+textStatus); }
     });
+    console.log(" set state all done... ");
+}
+
+function getStateTest()
+{
+    console.log(" getStateTest() ");
+    $.ajax({
+        type: "POST",
+        url: "https://wwwforms.suralink.com/utahjs.php",
+        data: {
+            secret: 'utahJs',
+            command: 'admin',
+            adminCommand: 'getState',
+            sKey: 'utahJs1234'
+        },
+        success: function(data) 
+        {
+            var returnObj = $.parseJSON(data);
+            console.log(" get state finished : ",returnObj);
+            if(returnObj.success)
+            {
+                console.log(" ok now what!!!!!!!! ");
+            }
+            else if(returnObj.error) { showErrorMessage(returnObj.msg); }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { if(XMLHttpRequest.status != 0) alert('error : heart beat. '+textStatus); }
+    });
+    console.log(" get state all done... ");
 }
 
 var heartBeatTimer;
@@ -101,9 +147,17 @@ function startHeartBeat()
             if(returnObj.success)
             {
                 console.log(" ok now what!!!!!!!! ");
-
-
-
+                
+                if(returnObj.data.hasOwnProperty('state'))
+                {
+                    console.log(" HAS A STATE !!!! ");
+                    console.log(" HAS A STATE !!!! ");
+                    if(returnObj.data.state.state != currentState.type)
+                    {
+                        console.log(" OMG it is a new type, load the fuckiing template.",returnObj.data.state);
+                        loadTemplate(returnObj.data.state.state,returnObj.data.idx);
+                    }
+                }
 
                 heartBeatTick();
             }
@@ -131,3 +185,5 @@ function heartBeatTick()
         }
     },2500);
 }
+
+
