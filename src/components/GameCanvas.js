@@ -22,6 +22,9 @@ class GameCanvas extends Component {
          let boxClicked = this.gridHash[gridKey];
          
          if (boxClicked.type === 'walkable') boxClicked._setDestination();
+         this.heroDestination = boxClicked;
+         // boxClicked._getNeighbors();
+         this._findPath();
       })
 
       this._renderLoop();
@@ -84,11 +87,14 @@ class GameCanvas extends Component {
 
    _iteratePath = () => {
       let lowestScore = -1;
+      let neighbors;
 
       this.opened.forEach(box => {
          if (lowestScore === -1 || box.fScore < lowestScore) {
+            console.log('once')
             lowestScore = box.fScore;
             this._nextNearest = box;
+            console.log('first', this._nextNearest);
          }
       })
 
@@ -98,22 +104,26 @@ class GameCanvas extends Component {
          if (inOpened) this.opened = this.opened.filter(box => box.key !== this._nextNearest.key);
          this.closed.push(inOpened);
 
-         // this._nextNearest.setNearestState();
-         let neighbors = this._nextNearest._getNeighbors();
+         this._nextNearest._setNearestState();
+         neighbors = this._nextNearest._getNeighbors();
          neighbors.forEach((box, i) => {
-            if (box.type !== 'blocked' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
+            if (box.type !== 'blocked'  && box.type !== 'damage' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
                if (!this.opened.find(c => c.key === box.key)) {
+                  console.log('if', this._nextNearest);
                   this.opened.push(box);
-                  box._setParent(this._nextNearest);
+                  box._setNeighborState();
 
-                  box.gScore = box.parentZone.gScore + calcGScore(box.direction);
-                  box.hScore = calcHScore(box);
-                  box.fScore = calcFScore(box);
+                  box._setParent(this._nextNearest);
+                  console.log('parentZone', box.parentZone)
+                  box.gScore = box.parentZone.gScore || 0 + this._calcGScore(box.direction);
+                  box.hScore = this._calcHScore(box);
+                  box.fScore = this._calcFScore(box);
                } else {
-                  if (this._nextNearest.gScore + calcGScore(box.direction) < box.gScore) {
+                  console.log('else', this._nextNearest);
+                  if (this._nextNearest.gScore + this._calcGScore(box.direction) < box.gScore) {
                      box.parentZone = this._nextNearest;
-                     box.gScore = this._nextNearest.gScore + calcGScore(box.direction);
-                     box.fScore = calcFScore(box);
+                     box.gScore = this._nextNearest.gScore + this._calcGScore(box.direction);
+                     box.fScore = this._calcFScore(box);
                   }
                }
             }
@@ -122,11 +132,13 @@ class GameCanvas extends Component {
             this.allDone = true;
          }
          this._iterations++;
+         console.log(neighbors)
+         // return;
          if (!this.allDone) this._iteratePath();
       }
    }
 
-   _findPath = (srcBox, destBox) => {
+   _findPath = () => {
       this._iterations = 0;
       this._allDone = false;
       this._nextNearest = null;
@@ -135,10 +147,31 @@ class GameCanvas extends Component {
       this.closed = [];
       this.path = [];
 
-      this.opened.push(srcBox);
+      this.opened.push(this.heroPosition);
 
       this._iteratePath();
    }
+
+   _calcFScore = box => box.gScore + box.hScore;
+   _calcHScore = box => ((Math.abs(box.x - this.heroDestination.x) + Math.abs(box.y - this.heroDestination.y)) * 10)
+   _calcGScore = dir => {
+      switch (dir) {
+         case 'NORTH':
+         case 'SOUTH':
+         case 'WEST':
+         case 'EAST':
+            return 10;
+         case 'NORTH_EAST':
+         case 'NORTH_WEST':
+         case 'SOUTH_EAST':
+         case 'SOUTH_WEST':
+            return 14;
+         default:
+            return 0;
+      }
+
+   };
+
 
    GameClasses = (() => {
       const that = this;
@@ -164,7 +197,7 @@ class GameCanvas extends Component {
             this.hScore = 0;
             this.fScore = 0;
 
-            this.parentZone = null;
+            this.parentZone = {};
             this._setParent = box => this.parentZone = box;
             this._clearParent = () => this.parentZone = null;
 
@@ -194,11 +227,12 @@ class GameCanvas extends Component {
                delete this.heroDestination;
             }
 
-            this._getScore = () => {
+            this._setNearestState = () => this.sprite = { x: 0, y: 150, width: 50, height: 50, type: 0 };
 
-            }
+            this._setNeighborState = () => this.sprite = { x: 0, y: 200, width: 50, height: 50, type: 0 };
+
             this._getNeighbors = () => {
-               let { gX, gY, x, y } = this;
+               let { gX, gY } = this;
                let neighbors = [];
                console.log(`${gX}-${gY}`)
                
@@ -238,26 +272,8 @@ class GameCanvas extends Component {
    }
 }
 
-const randomHex = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+// const randomHex = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 const randInt = n => (Math.floor(Math.random() * n) + 1);
-const calcFScore = box => box.gScore + box.hScore;
-const calcHScore = box => ((Math.abs(box.x - this.heroDestination.x) + Math.abs(box.y - this.heroDestination.y)) * 10)
-const calcGScore = dir => {
-   switch (dir) {
-			case 'NORTH':
-			case 'SOUTH':
-			case 'WEST':
-			case 'EAST':
-				return 10;
-			case 'NORTH_EAST':
-			case 'NORTH_WEST':
-			case 'SOUTH_EAST':
-			case 'SOUTH_WEST':
-				return 14;
-			default:
-				return 0;
-		}
-};
 
 const grid = {
    _getRandomConstant: () => ([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0][(Math.floor(Math.random() * (20 - 1)) + 1)]),
@@ -301,15 +317,15 @@ const grid = {
    }
 }
 
-const nDirections = { 0: 'NORTH_WEST', 1: 'NORTH', 2: 'NORTH_EAST', 3: 'WEST', 5: 'EAST', 6: 'SOUTH_WEST', 7: 'SOUTH', 8: 'SOUTH_EAST' };
+const nDirections = { 0: 'NORTH_WEST', 3: 'NORTH', 6: 'NORTH_EAST', 1: 'WEST', 7: 'EAST', 2: 'SOUTH_WEST', 5: 'SOUTH', 8: 'SOUTH_EAST' };
 
 export default GameCanvas;
 
-let levelSprites = {
-   walkable: { zones: [{ x: 0, y: 0, width: 50, height: 50, type: 0 }, { x: 0, y: 50, width: 50, height: 50, type: 0 }, { x: 0, y: 100, width: 50, height: 50, type: 0 }] },
-   walkableSlow: { zones: [{ x: 100, y: 0, width: 50, height: 50, type: 2, slow: 0.25 }, { x: 100, y: 50, width: 50, height: 50, type: 2, slow: 0.50 }, { x: 100, y: 100, width: 50, height: 50, type: 2, slow: 0.75 }] },
-   blocked: { zones: [{ x: 50, y: 0, width: 50, height: 50, type: 1 }, { x: 50, y: 50, width: 50, height: 50, type: 1 }, { x: 50, y: 100, width: 50, height: 50, type: 1 }] },
-   damage: { zones: [{ x: 200, y: 0, width: 50, height: 50, type: 4, slow: 0.75, damage: 0.25 }, { x: 200, y: 50, width: 50, height: 50, slow: 0.35, damage: 0.50, type: 4 }, { x: 200, y: 100, width: 50, height: 50, slow: 0.55, damage: 0.75, type: 4 }] }
-}
+// let levelSprites = {
+//    walkable: { zones: [{ x: 0, y: 0, width: 50, height: 50, type: 0 }, { x: 0, y: 50, width: 50, height: 50, type: 0 }, { x: 0, y: 100, width: 50, height: 50, type: 0 }] },
+//    walkableSlow: { zones: [{ x: 100, y: 0, width: 50, height: 50, type: 2, slow: 0.25 }, { x: 100, y: 50, width: 50, height: 50, type: 2, slow: 0.50 }, { x: 100, y: 100, width: 50, height: 50, type: 2, slow: 0.75 }] },
+//    blocked: { zones: [{ x: 50, y: 0, width: 50, height: 50, type: 1 }, { x: 50, y: 50, width: 50, height: 50, type: 1 }, { x: 50, y: 100, width: 50, height: 50, type: 1 }] },
+//    damage: { zones: [{ x: 200, y: 0, width: 50, height: 50, type: 4, slow: 0.75, damage: 0.25 }, { x: 200, y: 50, width: 50, height: 50, slow: 0.35, damage: 0.50, type: 4 }, { x: 200, y: 100, width: 50, height: 50, slow: 0.55, damage: 0.75, type: 4 }] }
+// }
 
-let hero = { down: { x: 0, y: 0, width: 56, height: 72 }, up: { x: 0, y: 74, width: 53, height: 72 }, left: { x: 0, y: 146, width: 53, height: 72 }, right: { x: 0, y: 219, width: 53, height: 72 } }
+// let hero = { down: { x: 0, y: 0, width: 56, height: 72 }, up: { x: 0, y: 74, width: 53, height: 72 }, left: { x: 0, y: 146, width: 53, height: 72 }, right: { x: 0, y: 219, width: 53, height: 72 } }
