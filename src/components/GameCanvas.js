@@ -21,9 +21,10 @@ class GameCanvas extends Component {
          let gridKey = `${gCoords.x}-${gCoords.y}`;
          let boxClicked = this.gridHash[gridKey];
          
-         if (boxClicked.type === 'walkable') boxClicked._setDestination();
+
+         if (boxClicked.type !== 'walkable') return;
          this.heroDestination = boxClicked;
-         // boxClicked._getNeighbors();
+         boxClicked._setDestination();
          this._findPath();
       })
 
@@ -79,6 +80,7 @@ class GameCanvas extends Component {
             gridHash[key] = gridBox;
          }
       }
+
       console.log(gridHash)
       return gridHash;
    }
@@ -91,10 +93,8 @@ class GameCanvas extends Component {
 
       this.opened.forEach(box => {
          if (lowestScore === -1 || box.fScore < lowestScore) {
-            console.log('once')
             lowestScore = box.fScore;
             this._nextNearest = box;
-            console.log('first', this._nextNearest);
          }
       })
 
@@ -109,17 +109,15 @@ class GameCanvas extends Component {
          neighbors.forEach((box, i) => {
             if (box.type !== 'blocked'  && box.type !== 'damage' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
                if (!this.opened.find(c => c.key === box.key)) {
-                  console.log('if', this._nextNearest);
                   this.opened.push(box);
                   box._setNeighborState();
 
                   box._setParent(this._nextNearest);
-                  console.log('parentZone', box.parentZone)
+
                   box.gScore = box.parentZone.gScore || 0 + this._calcGScore(box.direction);
                   box.hScore = this._calcHScore(box);
                   box.fScore = this._calcFScore(box);
                } else {
-                  console.log('else', this._nextNearest);
                   if (this._nextNearest.gScore + this._calcGScore(box.direction) < box.gScore) {
                      box.parentZone = this._nextNearest;
                      box.gScore = this._nextNearest.gScore + this._calcGScore(box.direction);
@@ -132,8 +130,7 @@ class GameCanvas extends Component {
             this.allDone = true;
          }
          this._iterations++;
-         console.log(neighbors)
-         // return;
+         
          if (!this.allDone) this._iteratePath();
       }
    }
@@ -174,7 +171,7 @@ class GameCanvas extends Component {
 
 
    GameClasses = (() => {
-      const that = this;
+      const game = this;
       return {
          GridBox: function GridBox({ key, gX, gY, x, y, width, height, type, passable, friction, damage, color, sprite }) {
             this.key = key;
@@ -234,16 +231,20 @@ class GameCanvas extends Component {
             this._getNeighbors = () => {
                let { gX, gY } = this;
                let neighbors = [];
-               console.log(`${gX}-${gY}`)
                
                let nPosition = 0;
                for (let i = gX - 1; i <= gX + 1; i++) {
                   for (let j = gY - 1; j <= gY + 1; j++) {
-                     if ((i < 0 || j < 0 || i > 15 || j > 11) || (i === this.gX && j === this.gY)) { nPosition++; continue; }
-                     else { neighbors.push(Object.assign({}, { direction: nDirections[nPosition] }, that.gridHash[`${i}-${j}`])); nPosition++; }
+                     if ((i < 0 || j < 0 || i > 15 || j > 11) || (i === this.gX && j === this.gY)) {
+                        nPosition++;
+                        continue;
+                     }
+                     else {
+                        neighbors.push(Object.assign({},{ direction: nDirections[nPosition] }, game.gridHash[`${i}-${j}`]));
+                        nPosition++; }
                   }
                }
-               console.log(neighbors)
+               
                return neighbors
             }
          },
@@ -255,7 +256,7 @@ class GameCanvas extends Component {
 
             this.type = type;
             this.color = color;
-            this.sprit = sprite;
+            this.sprite = sprite;
          }
       }
    })()
@@ -275,8 +276,14 @@ class GameCanvas extends Component {
 // const randomHex = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 const randInt = n => (Math.floor(Math.random() * n) + 1);
 
+const char = {
+   charTypes: {
+      
+   }
+}
+
 const grid = {
-   _getRandomConstant: () => ([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 0, 0][(Math.floor(Math.random() * (20 - 1)) + 1)]),
+   _getRandomConstant: () => ([0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 1, 0, 0][(Math.floor(Math.random() * (20 - 1)) + 1)]),
    gridTypes: {
       0: {
          type: 'walkable',
@@ -285,7 +292,7 @@ const grid = {
          friction: 0,
          damage: 0,
          color: '#d2d2d2',
-         sprite: [{ x: 0, y: 0, width: 50, height: 50, type: 0 }][0]
+         sprite: { x: 0, y: 0, width: 50, height: 50, type: 0 }
       },
       1: {
          type: 'walkableSlow',
