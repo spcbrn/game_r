@@ -18,7 +18,7 @@ class GameCanvas extends Component {
       this.canvas.addEventListener('click', e => {
          let gCoords = { x: Math.ceil((e.clientX - 240) / 50), y: Math.ceil((e.clientY - 212) / 50) };
          let gridKey = `${gCoords.x}-${gCoords.y}`;
-         console.log(`Clicked on grid tile ${gridKey}`);
+         console.log(this.gridHash[gridKey]);
       })
 
       this._renderLoop();
@@ -88,6 +88,10 @@ class GameCanvas extends Component {
          this.damage = damage;
          this.color = color;
          this.sprite = sprite;
+
+         this._getNeighbors = () => {
+
+         }
       },
       CharBox: function CharBox({ x, y, width, height, type, color, sprite }) {
          this.x = x || 0;
