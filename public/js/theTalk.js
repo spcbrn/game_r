@@ -21,11 +21,15 @@ function  initTalk()
 {
     console.log(" init the talk!!!! ");
     loadTemplate('intro');
+
+    heartBeatTick();    
 }
 
 function loadTemplate(type,idx)
 {
     console.log("loadTemplate("+type+","+idx+") ");
+
+    currentState = {type:type,idx:idx};
 
     switch(type)
     {
@@ -47,12 +51,83 @@ function loadTemplate(type,idx)
     }
 }
 
-function startHeartBeat()
+function setState(type,idx)
 {
-
+    console.log(" setState");
+    $.ajax({
+        type: "POST",
+        url: "https://wwwforms.suralink.com/utahjs.php",
+        data: {
+            secret: 'utahJs',
+            command: 'admin',
+            sKey: utahJs1234
+            state: {type:type,idx:idx}
+        },
+        success: function(data) 
+        {
+            var returnObj = $.parseJSON(data);
+            console.log(" set state finished : ",returnObj);
+            if(returnObj.success)
+            {
+                console.log(" ok now what!!!!!!!! ");
+            }
+            else if(returnObj.error) { showErrorMessage(returnObj.msg); }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { if(XMLHttpRequest.status != 0) alert('error : heart beat. '+textStatus); }
+    });
 }
 
-function processHeartBeat()
+var heartBeatTimer;
+var heartBeatTicks=0;
+var heartBeatProcessing = false;
+function startHeartBeat()
 {
-    
+    console.log(" startHeartBeat....");
+    $.ajax({
+        type: "POST",
+        url: "https://wwwforms.suralink.com/utahjs.php",
+        data: {
+            secret: 'utahJs',
+            command: 'heartBeat',
+            heartBeatTicks: heartBeatTicks,
+            currentState: currentState,
+        },
+        success: function(data) 
+        {
+            heartBeatProcessing = false;
+
+            var returnObj = $.parseJSON(data);
+            console.log(" okay got some data..... : ",returnObj);
+            if(returnObj.success)
+            {
+                console.log(" ok now what!!!!!!!! ");
+
+
+
+
+                heartBeatTick();
+            }
+            else if(returnObj.error) { showErrorMessage(returnObj.msg); }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { if(XMLHttpRequest.status != 0) alert('error : heart beat. '+textStatus); }
+    });
+}
+
+function heartBeatTick()
+{
+    console.log(" heartBeatTick ...."); 
+    setTimeout(function(){
+        console.log(" heartBeatTock ...."); 
+        if(!heartBeatProcessing)
+        {
+            heartBeatTicks++;
+            console.log(" heartBeatTick() __________ <"+heartBeatTicks+"> ");
+            heartBeatProcessing = true;
+            startHeartBeat();
+        }
+        else
+        {
+            console.log(" uhhhh im busy");
+        }
+    },2500);
 }
