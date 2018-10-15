@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 
-const ssUrl = require('./../art/spritesheet.png');
-const spriteSheet = new Image();
-spriteSheet.src = ssUrl;
+const gsPath = require('./../art/spritesheet.png');
+const gridSprites = new Image();
+gridSprites.src = gsPath;
+
+const csPath = require('./../art/theDude.png');
+const heroSprites = new Image();
+heroSprites.src = csPath;
 
 class GameCanvas extends Component {
    constructor() {
@@ -11,10 +15,15 @@ class GameCanvas extends Component {
    }
 
    componentDidMount = () => {
+      this._initializeGameCanvas();
+   }
+
+   _initializeGameCanvas = () => {
       this.canvas = this.refs.g_canvas;
       this.ctx = this.canvas.getContext('2d');
 
       this.gridHash = this._initGrid({ rows: 12, cols: 16, t_width: 800, t_height: 600 });
+      this.hero = this._initHero();
 
       this.canvas.addEventListener('click', e => {
          let gCoords = { x: (Math.ceil((e.clientX - 240) / 50) - 1), y: (Math.ceil((e.clientY - 212) / 50) - 1) };
@@ -23,9 +32,11 @@ class GameCanvas extends Component {
          
 
          if (boxClicked.type !== 'walkable') return;
-         this.heroDestination = boxClicked;
-         boxClicked._setDestination();
-         this._findPath();
+         if (!this.findingPath) {
+            this.heroDestination = boxClicked;
+            boxClicked._setDestination();
+            this._findPath();
+         }
       })
 
       this._renderLoop();
@@ -39,17 +50,28 @@ class GameCanvas extends Component {
    _drawRender = () => {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this._drawGrid();
+      this._drawBox('hero', this.hero);
    }
 
    _drawBox = (type, box) => {
       if (!box) return;
 
-      if (type === 'grid') {
-         this.ctx.fillRect(box.x, box.y, box.width, box.height);
-         this.ctx.drawImage(spriteSheet, box.sprite.x, box.sprite.y, box.sprite.width, box.sprite.height, box.x, box.y, box.width, box.height);
-      } else {
+      switch (type) {
+         case 'grid':
+            this.ctx.fillRect(box.x, box.y, box.width, box.height);
+            this.ctx.drawImage(gridSprites, box.sprite.x, box.sprite.y, box.sprite.width, box.sprite.height, box.x, box.y, box.width, box.height);
+            // console.log(box.key, box.gScore)
+            if (box.gScore) {
+               this.ctx.font = '20px Arial';
+               this.ctx.fillStyle = box.type === 'walkableSlow' ? '#603F39' : box.type === 'damage' ? '#F07E2D' : '#FFF';
+               this.ctx.fillText(box.gScore, box.x + 20, box.y + 20);
+            }
+            return;
+         case 'hero':
          this.ctx.fillStyle = box.color;
-         this.ctx.fillRect(box.x, box.y, box.width, box.height);
+            this.ctx.fillRect(box.x, box.y, box.width, box.height);
+            this.ctx.drawImage(heroSprites, box.sprite.x, box.sprite.y, box.sprite.width, box.sprite.height, box.x, box.y, box.width, box.height);
+            return;
       }
    }
 
@@ -81,92 +103,154 @@ class GameCanvas extends Component {
          }
       }
 
-      console.log(gridHash)
       return gridHash;
+   }
+
+   _resetGrid = () => {
+      for (let coords in this.gridHash) {
+         let box = this.gridHash[coords];
+         box.sprite = box.origSprite;
+         box.gScore = 0;
+         box.hScore = 0;
+         box.fScore = 0;
+         box._deselect();
+         box._clearParent();
+         box._clearDestination();
+         if (this.heroPosition.key !== box.key) box._clearSource();
+         this.gridHash[coords] = box;
+      }
+   }
+
+   _initHero = () => {
+      let { x, y } = this.heroPosition;
+      let heroConfig = char.charTypes[0];
+      return new this.GameClasses.CharBox({ x, y, sprite: heroConfig.spriteSet.down, ...heroConfig })
+   }
+
+   _tweenHero = destBox => {
+      this.hero._setDirection(destBox.direction);
+      this.hero.x = destBox.x;
+      this.hero.y = destBox.y;
    }
 
    _highlightPath = box => null
 
-   _iteratePath = () => {
-      let lowestScore = -1;
+   _iteratePath = async () => {
+      let lowestScore = -99;
       let neighbors;
 
+      function timeout(ms) {
+         return new Promise(resolve => setTimeout(resolve, ms));
+      }
+      async function sleep(fn, ...args) {
+            await timeout(300);
+            return fn(...args);
+      }
+      await sleep(() => null)
+
       this.opened.forEach(box => {
-         if (lowestScore === -1 || box.fScore < lowestScore) {
+         if (lowestScore === -99 || box.fScore < lowestScore) {
             lowestScore = box.fScore;
             this._nextNearest = box;
          }
       })
 
-      if (this._nextNearest.isDestination) this._highlightPath(this._nextNearest);
-      else {
+      if (this._nextNearest.isDestination) {
+         this._tweenHero(this._nextNearest);
+         this._finishPath();
+         return;
+      } else {
          let inOpened = this.opened.find(box => box.key === this._nextNearest.key)
-         if (inOpened) this.opened = this.opened.filter(box => box.key !== this._nextNearest.key);
-         this.closed.push(inOpened);
-
-         this._nextNearest._setNearestState();
+         if (inOpened) {
+            this.opened = this.opened.filter(box => box.key !== this._nextNearest.key);
+            this.closed.push(inOpened);
+            this.path[inOpened.key] = inOpened;
+            this._tweenHero(inOpened);
+         }
+         
          neighbors = this._nextNearest._getNeighbors();
-         neighbors.forEach((box, i) => {
-            if (box.type !== 'blocked'  && box.type !== 'damage' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
+         neighbors.forEach(box => {
+            if (box.type !== 'blocked'  && box.type !== 'ff' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
                if (!this.opened.find(c => c.key === box.key)) {
                   this.opened.push(box);
                   box._setNeighborState();
-
-                  box._setParent(this._nextNearest);
-
-                  box.gScore = box.parentZone.gScore || 0 + this._calcGScore(box.direction);
+                  
+                  this._nextNearest._setNearestState();
+                  box.parentZone = this._nextNearest;
+                  
+                  box.gScore = (box.parentZone.gScore || 0) + this._calcGScore(box);
                   box.hScore = this._calcHScore(box);
                   box.fScore = this._calcFScore(box);
                } else {
-                  if (this._nextNearest.gScore + this._calcGScore(box.direction) < box.gScore) {
+                  if (this._nextNearest.gScore + this._calcGScore(box) < box.gScore) {
                      box.parentZone = this._nextNearest;
-                     box.gScore = this._nextNearest.gScore + this._calcGScore(box.direction);
+                     box.gScore = this._nextNearest.gScore + this._calcGScore(box);
                      box.fScore = this._calcFScore(box);
                   }
                }
             }
+            this.gridHash[box.key].gScore = box.gScore;
          })
          if (!this.opened.length || this._iterations > 800) {
             this.allDone = true;
          }
          this._iterations++;
-         
          if (!this.allDone) this._iteratePath();
       }
    }
 
    _findPath = () => {
+      console.log('starting path')
+      this.findingPath = true;
+
       this._iterations = 0;
       this._allDone = false;
       this._nextNearest = null;
 
       this.opened = [];
       this.closed = [];
-      this.path = [];
+      this.path = {};
 
       this.opened.push(this.heroPosition);
 
       this._iteratePath();
    }
 
+   _finishPath = () => {
+      console.log('finished')
+      this.heroPosition = this.gridHash[this.heroDestination.key];
+      delete this.heroDestination;
+      this._resetGrid();
+      this.findingPath = false;
+   }
+
    _calcFScore = box => box.gScore + box.hScore;
    _calcHScore = box => ((Math.abs(box.x - this.heroDestination.x) + Math.abs(box.y - this.heroDestination.y)) * 10)
-   _calcGScore = dir => {
-      switch (dir) {
+   _calcGScore = box => {
+      let { direction, type } = box;
+      let score = 0;
+      
+      switch (direction) {
          case 'NORTH':
          case 'SOUTH':
          case 'WEST':
          case 'EAST':
-            return 10;
+            score += 10;
+            break;
          case 'NORTH_EAST':
          case 'NORTH_WEST':
          case 'SOUTH_EAST':
          case 'SOUTH_WEST':
-            return 14;
+            score += 20;
+            break;
          default:
-            return 0;
+            break;
       }
 
+      if (type === 'walkableSlow') score += 15;
+      if (type === 'damage') score += 25;
+      // console.log(box.key, box.direction, type, score)
+      return score;
    };
 
 
@@ -225,38 +309,40 @@ class GameCanvas extends Component {
             }
 
             this._setNearestState = () => this.sprite = { x: 0, y: 150, width: 50, height: 50, type: 0 };
-
             this._setNeighborState = () => this.sprite = { x: 0, y: 200, width: 50, height: 50, type: 0 };
-
             this._getNeighbors = () => {
                let { gX, gY } = this;
                let neighbors = [];
-               
                let nPosition = 0;
+               
                for (let i = gX - 1; i <= gX + 1; i++) {
                   for (let j = gY - 1; j <= gY + 1; j++) {
-                     if ((i < 0 || j < 0 || i > 15 || j > 11) || (i === this.gX && j === this.gY)) {
-                        nPosition++;
-                        continue;
-                     }
+                     if ((i < 0 || j < 0 || i > 15 || j > 11) || (i === this.gX && j === this.gY)) { nPosition++; continue; }
                      else {
+                        if (nPosition === 0 || nPosition === 2 || nPosition === 6 || nPosition === 8) { nPosition++; continue; };
                         neighbors.push(Object.assign({},{ direction: nDirections[nPosition] }, game.gridHash[`${i}-${j}`]));
-                        nPosition++; }
+                        nPosition++;
+                     }
                   }
                }
-               
                return neighbors
             }
          },
-         CharBox: function CharBox({ x, y, width, height, type, color, sprite }) {
+         CharBox: function CharBox({ x, y, width, height, type, color, sprite, spriteSet }) {
             this.x = x || 0;
             this.y = y || 0;
             this.width = width || 0;
             this.height = height || 0;
 
             this.type = type;
-            this.color = color;
+            this.color = color || 'rgba(255,255,255,0)';
             this.sprite = sprite;
+            this.spriteSet = spriteSet;
+
+            this._setDirection = dir => {
+               let transDir = { NORTH: 'up', SOUTH: 'down', EAST: 'right', WEST: 'left' };
+               this.sprite = this.spriteSet[transDir[dir || 'SOUTH']];
+            }
          }
       }
    })()
@@ -276,14 +362,21 @@ class GameCanvas extends Component {
 // const randomHex = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 const randInt = n => (Math.floor(Math.random() * n) + 1);
 
+const nDirections = { 0: 'NORTH_WEST', 1: 'WEST', 2: 'SOUTH_WEST', 3: 'NORTH', 5: 'SOUTH', 6: 'NORTH_EAST', 7: 'EAST', 8: 'SOUTH_EAST' };
 const char = {
    charTypes: {
-      
+      0: {
+         type: 'ninja',
+         const: 0,
+         width: 50,
+         height: 50,
+         spriteSet: { down: { x: 0, y: 0, width: 56, height: 72 }, up: { x: 0, y: 74, width: 53, height: 72 }, left: { x: 0, y: 146, width: 53, height: 72 }, right: { x: 0, y: 219, width: 53, height: 72 } }
+      }
    }
 }
 
 const grid = {
-   _getRandomConstant: () => ([0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 1, 0, 0][(Math.floor(Math.random() * (20 - 1)) + 1)]),
+   _getRandomConstant: () => ([0, 0, 2, 0, 2, 2, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 2, 0, 0][(Math.floor(Math.random() * (20 - 1)) + 1)]),
    gridTypes: {
       0: {
          type: 'walkable',
@@ -324,7 +417,6 @@ const grid = {
    }
 }
 
-const nDirections = { 0: 'NORTH_WEST', 1: 'WEST', 2: 'SOUTH_WEST', 3: 'NORTH', 5: 'SOUTH', 6: 'NORTH_EAST', 7: 'EAST', 8: 'SOUTH_EAST' };
 
 export default GameCanvas;
 
