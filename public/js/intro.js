@@ -6,8 +6,19 @@ window.addEventListener('load', function(){
         this.play();
     }, false);
 
-    setTimeout(function () {newVideo.play();}, 500);
-    setTimeout(function () {newVideo.play();}, 1000);
-    setTimeout(function () {newVideo.play();}, 5000);
+    setTimeout(function () {newVideo.pause();}, 500);
     $("#introVideo").click(function() {newVideo.play();});
+
+    $("#start").click(startIntro);
+    $("#videoStartWrapper").click(startIntro);
+    $("#videoStart").click(startIntro);
 });
+
+function startIntro()
+{
+    $("#start").hide();
+    var newVideo = document.getElementById('introVideo');
+    newVideo.play();
+
+    parent.startIntro();
+}

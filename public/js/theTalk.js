@@ -8,30 +8,65 @@ window.addEventListener('load', function(){
 });
 
 var states = [];
-states[0] = {title:"Into Slide",template:"intro.html"};
-states[1] = {title:"Talk Slide",template:"slideViewer.html",slide:1};
-states[2] = {title:"Talk Slide",template:"slideViewer.html",slide:2};
-states[3] = {title:"Talk Slide",template:"slideViewer.html",slide:3};
-states[4] = {title:"Talk Slide",template:"slideViewer.html",slide:4};
-states[5] = {title:"Interactive",template:"gameLoader.html"};
+states[0] = {title:"Into Slide",template:"intro.php"};
+states[1] = {title:"Talk Slide",template:"slideViewer.php",slide:1};
+states[2] = {title:"Talk Slide",template:"slideViewer.php",slide:2};
+states[3] = {title:"Talk Slide",template:"slideViewer.php",slide:3};
+states[4] = {title:"Talk Slide",template:"slideViewer.php",slide:4};
+states[5] = {title:"Interactive",template:"gameLoader.php"};
 
 var currentState = 0;
 var admin = false;
 
 function  initTalk()
 {
-    console.log(" init the talk!!!! ");
     loadTemplate('intro');
-
     heartBeatTick();    
 
     console.log("test:",$.urlParam('admin'));
     if($.urlParam('admin'))
     {
-        $("#controlPanelFrame").attr('src', "templates/controlPanel.html");
+        $("#controlPanelFrame").attr('src', "templates/controlPanel.php");
         $("#controlContainer").show();
         admin = true;
     }
+}
+
+function startIntro()
+{
+    $("#menuContainer").show();
+    $("#jobContainer").show();
+
+
+    // Set the date we're counting down to
+    var countDownDate = new Date("Oct 16, 2018 19:30:00").getTime();
+
+    // Update the count down every 1 second
+    var x = setInterval(function() {
+
+    // Get todays date and time
+    var now = new Date().getTime();
+
+    // Find the distance between now and the count down date
+    var distance = countDownDate - now;
+
+    // Time calculations for days, hours, minutes and seconds
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Display the result in the element with id="demo"
+    document.getElementById("countDownTime").innerHTML = days + "d " + hours + "h "
+    + minutes + "m " + seconds + "s ";
+
+    // If the count down is finished, write some text 
+    if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("countDownTime").innerHTML = "EXPIRED";
+    }
+    }, 1000);
+    
 }
 
 function loadTemplate(type,idx)
@@ -44,19 +79,19 @@ function loadTemplate(type,idx)
     switch(type)
     {
         case 'intro' :
-            $("#talkFrame").attr('src', "templates/intro.html");
+            $("#talkFrame").attr('src', "templates/intro.php");
         break;
 
         case 'slides' :
-            $("#talkFrame").attr('src', "templates/slideViewer.html?idx="+idx);
+            $("#talkFrame").attr('src', "templates/slideViewer.php?idx="+idx);
         break;
 
         case 'game' :
-            $("#talkFrame").attr('src', "templates/gameLoader.html?idx="+idx);
+            $("#talkFrame").attr('src', "templates/gameLoader.php?idx="+idx);
         break;
 
         case 'quiz' :
-            $("#talkFrame").attr('src', "templates/quizSlide.html?idx="+idx);
+            $("#talkFrame").attr('src', "templates/quizSlide.php?idx="+idx);
         break;
 
         default: fail = true;
@@ -68,66 +103,12 @@ function loadTemplate(type,idx)
     }
 }
 
-function setState(type,idx)
-{
-    console.log(" setState::: "+type+","+idx+" < ");
-    $.ajax({
-        type: "POST",
-        url: "https://wwwforms.suralink.com/utahjs.php",
-        data: {
-            secret: 'utahJs',
-            command: 'admin',
-            adminCommand: 'setState',
-            sKey: 'utahJs1234',
-            state: currentState
-        },
-        success: function(data) 
-        {
-            var returnObj = $.parseJSON(data);
-            console.log(" set state finished : ",returnObj);
-            if(returnObj.success)
-            {
-                console.log(" ok now what!!!!!!!! ");
-            }
-            else if(returnObj.error) { showErrorMessage(returnObj.msg); }
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) { if(XMLHttpRequest.status != 0) alert('error : heart beat. '+textStatus); }
-    });
-    console.log(" set state all done... ");
-}
-
-function getStateTest()
-{
-    console.log(" getStateTest() ");
-    $.ajax({
-        type: "POST",
-        url: "https://wwwforms.suralink.com/utahjs.php",
-        data: {
-            secret: 'utahJs',
-            command: 'admin',
-            adminCommand: 'getState',
-            sKey: 'utahJs1234'
-        },
-        success: function(data) 
-        {
-            var returnObj = $.parseJSON(data);
-            console.log(" get state finished : ",returnObj);
-            if(returnObj.success)
-            {
-                console.log(" ok now what!!!!!!!! ");
-            }
-            else if(returnObj.error) { showErrorMessage(returnObj.msg); }
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) { if(XMLHttpRequest.status != 0) alert('error : heart beat. '+textStatus); }
-    });
-    console.log(" get state all done... ");
-}
-
 var heartBeatTimer;
 var heartBeatTicks=0;
 var heartBeatProcessing = false;
 function startHeartBeat()
 {
+    return;
     console.log(" startHeartBeat....");
     $.ajax({
         type: "POST",
@@ -147,7 +128,6 @@ function startHeartBeat()
             if(returnObj.success)
             {
                 console.log(" ok now what!!!!!!!! ");
-                
                 if(returnObj.data.hasOwnProperty('state'))
                 {
                     console.log(" HAS A STATE !!!! ");
