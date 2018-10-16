@@ -11,82 +11,88 @@ const heroSprites = new Image();
 heroSprites.src = csPath;
 
 class GameCanvas extends Component {
-   constructor() {
-      super();
-
-   }
-
    componentDidMount = () => {
-      this.target = { alpha: 0 };
+      this.showPath = true;
+      this.showScore = true;
+      this.heroTweenA = true;
       this._initializeGameCanvas();
-      console.log('utils: ', utils)
    }
 
    _initializeGameCanvas = () => {
       this.canvas = this.refs.g_canvas;
       this.ctx = this.canvas.getContext('2d');
 
+      // instantiate level grid objects to be draw into canvas
       this.gridHash = this._initGrid({ rows: 12, cols: 16, t_width: 800, t_height: 600 });
+      //instantiate hero object
       this.hero = this._initHero();
 
+      // handle user input/interactions
       this.canvas.addEventListener('click', e => {
          let gCoords = { x: (Math.ceil(e.clientX / 50) - 1), y: (Math.ceil(e.clientY / 50) - 1) };
          let gridKey = `${gCoords.x}-${gCoords.y}`;
          let boxClicked = this.gridHash[gridKey];
          
-         console.log('click grid hash: ', this.gridHash)
          if (boxClicked.type !== 'walkable') return;
          if (!this.findingPath) {
             boxClicked._setDestination();
             this.heroDestination = boxClicked;
-            console.log('clicked ', this.heroDestination)
             this._findPath();
-         } else {
-            
          }
       })
 
-      console.log('init grid hash: ', this.gridHash)
-
+      // commence render loop
       this._renderLoop();
    }
 
+   // recursively redraw canvas using requestAnimationFrame
    _renderLoop = _ts => {
       this._drawRender();
-      requestAnimationFrame(this._renderLoop);
       TWEEN.update(_ts);
+      requestAnimationFrame(this._renderLoop);
    }
 
+   // clear canvas and redraw all objects according to new state
    _drawRender = () => {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this._drawGrid();
       this._drawBox('hero', this.hero);
    }
 
+   // function to draw individual game objects to the canvas
    _drawBox = (type, box) => {
       if (!box) return;
 
       switch (type) {
          case 'grid':
+
             this.ctx.fillRect(box.x, box.y, box.width, box.height);
             this.ctx.drawImage(gridSprites, box.sprite.x, box.sprite.y, box.sprite.width, box.sprite.height, box.x, box.y, box.width, box.height);
-            // console.log(box.key, box.gScore)
-            if (box.gScore || false) {
+            
+            if (box.gScore && this.showScore) {
                this.ctx.font = '20px Arial';
                this.ctx.fillStyle = box.type === 'walkableSlow' ? '#603F39' : box.type === 'damage' ? '#F07E2D' : '#FFF';
                this.ctx.fillText(box.gScore, box.x + 5, box.y + 20);
             }
+
             return;
          case 'hero':
-         this.ctx.fillStyle = box.color;
+
+            this.ctx.fillStyle = box.color;
             this.ctx.fillRect(box.x, box.y, box.width, box.height);
             this.ctx.drawImage(heroSprites, box.sprite.x, box.sprite.y, box.sprite.width, box.sprite.height, box.x, box.y, box.width, box.height);
+
+            return;
+
+         default:
             return;
       }
    }
 
-   _drawGrid = () => { for (let coords in this.gridHash) this._drawBox('grid', this.gridHash[coords]) }
+   // recursively draw each grid object
+   _drawGrid = () => Object.values(this.gridHash).forEach(box => this._drawBox('grid', box))
 
+   // instantiate set of grid objects, randomly assigning a type
    _initGrid = ({ rows, cols, t_width, t_height }) => {
       let width = t_width / cols;
       let height = t_height / rows;
@@ -116,12 +122,14 @@ class GameCanvas extends Component {
       return gridHash;
    }
 
+   // instantiate hero object
    _initHero = () => {
       let { x, y } = this.heroPosition;
       let heroConfig = char.charTypes[0];
       return new this.GameClasses.CharBox({ x, y, sprite: heroConfig.spriteSet.down, ...heroConfig })
    }
 
+   // use tween function to draw hero's movement
    _tweenHero = (destBox, path) => {
          let tween;
 
@@ -137,25 +145,15 @@ class GameCanvas extends Component {
                tween = (new TWEEN.Tween(this.hero).to({ x: coord[0], y: coord[1] }, 320)).start()
             });
          }
-      // this.hero.x = destBox.x;
-      // this.hero.y = destBox.y;
    }
 
-   _highlightPath = box => null
-
+   // recursively read potential paths to choose the best one
    _iteratePath = async () => {
       let lowestScore = -99;
       let neighbors;
       if (this.allDone) return;
-      // function timeout(ms) {
-      //    return new Promise(resolve => setTimeout(resolve, ms));
-      // }
-      // async function sleep(fn, ...args) {
-      //       await timeout(300);
-      //       return fn(...args);
-      // }
-      // await sleep(() => null)
 
+      // wait 300ms between each iteratino
       await utils._prt(300)
 
       this.opened.forEach(box => {
@@ -165,8 +163,8 @@ class GameCanvas extends Component {
          }
       })
 
+      if (this.heroTweenA) this._tweenHero(this._nextNearest);
       if (this._nextNearest.isDestination) {
-         this._tweenHero(this._nextNearest);
          this._finishPath();
          return;
       } else {
@@ -175,7 +173,6 @@ class GameCanvas extends Component {
             this.opened = this.opened.filter(box => box.key !== this._nextNearest.key);
             this.closed.push(inOpened);
             this.path[inOpened.key] = inOpened;
-            this._tweenHero(inOpened);
          }
          
          neighbors = this._nextNearest._getNeighbors();
@@ -184,8 +181,10 @@ class GameCanvas extends Component {
                if (!this.opened.find(c => c.key === box.key)) {
                   this.opened.push(box);
 
-                  box._setNeighborState();
-                  this._nextNearest._setNearestState();
+                  if (this.showPath) {
+                        box._setNeighborState();
+                        this._nextNearest._setNearestState();
+                  }
                   
                   box.parentZone = this._nextNearest;
                   
@@ -230,7 +229,6 @@ class GameCanvas extends Component {
 
    _finishPath = () => {
       console.log('finished')
-      console.log('path: ', this.path)
       // this._tweenHero(null, Object.keys(this.path));
       this.heroPosition = this.gridHash[this.heroDestination.key];
       delete this.heroDestination;
@@ -333,10 +331,8 @@ class GameCanvas extends Component {
 
             this.isDestination = false;
             this._setDestination = () => {
-                  console.log('wtf mayte')
                this.isDestination = true;
                this.sprite = { x: 0, y: 100, width: 50, height: 50, type: 0 };
-               console.log(this)
             }
             this._clearDestination = () => {
                this.isDestination = false;
