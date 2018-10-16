@@ -1,3 +1,4 @@
+<?php require_once('../header.php'); ?>
 <html>
     <head>
             <script type="text/javascript">document.domain = "suralink.com";</script>

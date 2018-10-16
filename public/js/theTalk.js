@@ -21,7 +21,7 @@ var admin = false;
 function  initTalk()
 {
     loadTemplate('intro');
-    heartBeatTick();    
+    heartBeatTick();
 
     console.log("test:",$.urlParam('admin'));
     if($.urlParam('admin'))
@@ -107,9 +107,10 @@ var heartBeatTimer;
 var heartBeatTicks=0;
 var heartBeatProcessing = false;
 function startHeartBeat()
-{
-    return;
-    console.log(" startHeartBeat....");
+{                
+    var myId = Cookies.get('myId',myId);
+    var name = Cookies.get('name',name);
+
     $.ajax({
         type: "POST",
         url: "https://wwwforms.suralink.com/utahjs.php",
@@ -118,28 +119,38 @@ function startHeartBeat()
             command: 'heartBeat',
             heartBeatTicks: heartBeatTicks,
             currentState: currentState,
+            myId: myId,
+            name: name,
         },
         success: function(data) 
         {
             heartBeatProcessing = false;
-
             var returnObj = $.parseJSON(data);
-            console.log(" okay got some data..... : ",returnObj);
             if(returnObj.success)
             {
-                console.log(" ok now what!!!!!!!! ");
-                if(returnObj.data.hasOwnProperty('state'))
+                if(Cookies.get('myId'))
                 {
-                    console.log(" HAS A STATE !!!! ");
-                    console.log(" HAS A STATE !!!! ");
-                    if(returnObj.data.state.state != currentState.type)
+                    if(returnObj.data.hasOwnProperty('state'))
                     {
-                        console.log(" OMG it is a new type, load the fuckiing template.",returnObj.data.state);
-                        loadTemplate(returnObj.data.state.state,returnObj.data.idx);
+                        if(returnObj.data.state.state != currentState.type || returnObj.data.state.idx != currentState.idx)
+                        {
+                            loadTemplate(returnObj.data.state.state,returnObj.data.state.idx);
+                        }
                     }
-                }
 
-                heartBeatTick();
+
+                    if(returnObj.data.hasOwnProperty('session') && returnObj.data.session.hasOwnProperty('name'))
+                    {
+                        console.log(" SET NAME "+name);
+                        Cookies.set('name',returnObj.data.session.name);
+                    }
+
+                    heartBeatTick();
+                }
+                else
+                {
+                    loadTemplate('intro',0);
+                }
             }
             else if(returnObj.error) { showErrorMessage(returnObj.msg); }
         },
@@ -149,21 +160,36 @@ function startHeartBeat()
 
 function heartBeatTick()
 {
-    console.log(" heartBeatTick ...."); 
     setTimeout(function(){
-        console.log(" heartBeatTock ...."); 
         if(!heartBeatProcessing)
         {
             heartBeatTicks++;
-            console.log(" heartBeatTick() __________ <"+heartBeatTicks+"> ");
             heartBeatProcessing = true;
             startHeartBeat();
-        }
-        else
-        {
-            console.log(" uhhhh im busy");
         }
     },2500);
 }
 
+function showLeaderBoard()
+{
+    console.log(" --- showLeaderBoard()");
+    $("#menuContainer").show();
+}
 
+function hideLeaderBoard()
+{
+    console.log(" --- hideLeaderBoard()");
+    $("#menuContainer").hide();
+}
+
+function showJobs()
+{
+    console.log(" --- showJobs()");
+    $("#jobContainer").show();
+}
+
+function hideJobs()
+{
+    console.log(" --- hideJobs()");
+    $("#jobContainer").hide();
+}
