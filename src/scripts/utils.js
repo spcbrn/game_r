@@ -1,6 +1,17 @@
 class Utils {
    _prt = async to => await ((ms => new Promise(r => setTimeout(r, ms)))(to));
    _randInt = (a, b) => Math.floor(Math.random() * (b - a) + a);
+   _getRandomGridBox = grid => {
+      let destBox = null;
+
+      for (let key in grid) {
+         if (this._randInt(0, 100) > 95) destBox = grid[key];
+      }
+
+      if (!destBox) return this._getRandomGridBox();
+      
+      return destBox
+   }
    nDirections = { 0: 'NORTH_WEST', 1: 'WEST', 2: 'SOUTH_WEST', 3: 'NORTH', 5: 'SOUTH', 6: 'NORTH_EAST', 7: 'EAST', 8: 'SOUTH_EAST' };
    config = {
       grid: {

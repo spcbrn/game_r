@@ -29,9 +29,13 @@ export default ({ game, utils }) => ({
       this._deselect = () => this.isSelected = false;
 
       this.isSource = false;
+      this.isNextSource = false;
+      this._setNextSource = () => this.isNextSource = true;
       this._setSource = () => {
          this.isSource = true;
          this.sprite = { x: 0, y: 50, width: 50, height: 50, type: 0 };
+         game.heroPosition = this;
+         if (this.isNextSource) this.isNextSource = false;
       }
       this._clearSource = () => {
          this.isSource = false;
@@ -40,9 +44,13 @@ export default ({ game, utils }) => ({
       }
 
       this.isDestination = false;
+      this.isNextDestination = false;
+      this._setNextDestination = () => this.isNextDestination = true;
       this._setDestination = () => {
          this.isDestination = true;
          this.sprite = { x: 0, y: 100, width: 50, height: 50, type: 0 };
+         game.heroDestination = this;
+         if (this.isNextDestination) this.isNextDestination = false;
       }
       this._clearDestination = () => {
          this.isDestination = false;

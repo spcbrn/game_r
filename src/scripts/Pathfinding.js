@@ -1,90 +1,99 @@
 export default ({ game, utils }) => {
    class PathFinder {
       _findPath = () => {
-         if (game.allDone) game._resetGrid();
+         if (this.allDone) game._resetGrid();
          console.log('starting path')
+         
          game.findingPath = true;
    
-         game.allDone = false;
-         game._iterations = 0;
-         game._nextNearest = null;
+         this.allDone = false;
+         this._iterations = 0;
+         this._nextNearest = null;
    
-         game.opened = [];
-         game.closed = [];
-         game.path = {};
-   
-         game.opened.push(game.heroPosition);
-   
+         this.opened = [];
+         this.closed = [];
+         this.path = {};
+         
+         this.opened.push(game.heroPosition);
+
          this._iteratePath();
       }
 
       _finishPath = () => {
-         console.log('completed path')
-         // this._tweenHero(null, Object.keys(this.path));
-         game.heroPosition = game.gridHash[game.heroDestination.key];
-         delete game.heroDestination;
+         game.heroDestination._setNextSource();
          game.findingPath = false;
-         game.allDone = true;
+         
+         this.allDone = true;
+
+         console.log('completed path')
+
+         if (game.mode === 'raycast') {
+            let nextDestination = utils._getRandomGridBox(game.gridHash);
+            nextDestination._setNextDestination();
+            console.log(nextDestination)
+            this._findPath();
+         }
       }
 
       _iteratePath = async () => {
-         let lowestScore = -99;
+         if (this.allDone) return;      
+
+         let lowestScore = -1;
          let neighbors;
-         if (game.allDone) return;
-   
-         // wait 300ms between each iteratino
+         
+         // wait 300ms between each iteration
          await utils._prt(300)
    
-         game.opened.forEach(box => {
-            if (lowestScore === -99 || box.fScore < lowestScore) {
+         this.opened.forEach(box => {
+            if (lowestScore === -1 || box.fScore < lowestScore) {
                lowestScore = box.fScore;
-               game._nextNearest = box;
+               this._nextNearest = box;
             }
          })
    
-         if (game.heroTweenA) game._tweenHero(game._nextNearest);
-         if (game._nextNearest.isDestination) {
+         if (game.heroTweenA) game._tweenHero(this._nextNearest);
+         if (this._nextNearest.isDestination) {
             this._finishPath();
             return;
          } else {
-            let inOpened = game.opened.find(box => box.key === game._nextNearest.key)
+            let inOpened = this.opened.find(box => box.key === this._nextNearest.key)
             if (inOpened) {
-               game.opened = game.opened.filter(box => box.key !== game._nextNearest.key);
-               game.closed.push(inOpened);
-               game.path[inOpened.key] = inOpened;
+               this.opened = this.opened.filter(box => box.key !== this._nextNearest.key);
+               this.closed.push(inOpened);
+               this.path[inOpened.key] = inOpened;
             }
             
-            neighbors = game._nextNearest._getNeighbors();
+            neighbors = this._nextNearest._getNeighbors();
             neighbors.forEach(box => {
-               if (box.type !== 'blocked'  && box.type !== 'ff' && !box.isSource && !game.closed.find(c => c.key === box.key)) {
-                  if (!game.opened.find(c => c.key === box.key)) {
-                     game.opened.push(box);
+               if (box.type !== 'blocked'  && box.type !== 'ff' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
+                  if (!this.opened.find(c => c.key === box.key)) {
+                     this.opened.push(box);
    
                      if (game.showPath) {
                            box._setNeighborState();
-                           game._nextNearest._setNearestState();
+                           this._nextNearest._setNearestState();
                      }
                      
-                     box.parentZone = game._nextNearest;
+                     box.parentZone = this._nextNearest;
                      
                      box.gScore = (box.parentZone.gScore || 0) + this._calcGScore(box);
                      box.hScore = this._calcHScore(box);
                      box.fScore = this._calcFScore(box);
                   } else {
-                     if (game._nextNearest.gScore + this._calcGScore(box) < box.gScore) {
-                        box.parentZone = game._nextNearest;
-                        box.gScore = game._nextNearest.gScore + this._calcGScore(box);
+                     if (this._nextNearest.gScore + this._calcGScore(box) < box.gScore) {
+                        box.parentZone = this._nextNearest;
+                        box.gScore = this._nextNearest.gScore + this._calcGScore(box);
                         box.fScore = this._calcFScore(box);
                      }
                   }
                }
                game.gridHash[box.key].gScore = box.gScore;
             })
-            if (!game.opened.length || game._iterations > 800) {
-               game.allDone = true;
+            if (!this.opened.length || this._iterations > 800) {
+               this.allDone = true;
             }
-            game._iterations++;
-            if (!game.allDone) this._iteratePath();
+            this._iterations++;
+            if (!this.allDone) this._iteratePath();
          }
       }
 
@@ -113,7 +122,7 @@ export default ({ game, utils }) => {
 
          if (type === 'walkableSlow') score += 15;
          if (type === 'damage') score += 25;
-         // console.log(box.key, box.direction, type, score)
+         
          return score;
       };
    }
