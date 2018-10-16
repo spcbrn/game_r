@@ -6,13 +6,14 @@ import Pathfinder from '../scripts/Pathfinding.js';
 
 const TWEEN = require('@tweenjs/tween.js');
 
-const gsPath = require('./../art/spritesheet.png');
 const gridSprites = new Image();
-gridSprites.src = gsPath;
+gridSprites.src = require('./../art/spritesheet.png');
 
-const csPath = require('./../art/theDude.png');
 const heroSprites = new Image();
-heroSprites.src = csPath;
+heroSprites.src = require('./../art/theDude.png');
+
+const turretSprites = new Image();
+turretSprites.src = require('./../art/TurretR.png');
 
 class GameCanvas extends Component {
    constructor() {
@@ -53,25 +54,23 @@ class GameCanvas extends Component {
       this.gridHash = this._initGrid({ rows: 12, cols: 16, t_width: 800, t_height: 600 });
       // instantiate hero object
       this.hero = this._initHero();
-      // if raytrace mode, instantiate shooter
-      // this.shooter = this._initShooter();
-
+      
       // handle user input/interactions
-      if (this.mode === 'pathfind') {
+      // if (this.mode === 'pathfind') {
          this.canvas.addEventListener('click', e => {
             let gCoords = { x: (Math.ceil(e.clientX / 50) - 1), y: (Math.ceil(e.clientY / 50) - 1) };
             let gridKey = `${gCoords.x}-${gCoords.y}`;
             let boxClicked = this.gridHash[gridKey];
-   
+            
             if (boxClicked.type !== 'walkable') return;
             if (!this.findingPath) {
                if (this.heroDestination && (this.heroDestination.key !== boxClicked.key)) boxClicked._setNextDestination();
                else boxClicked._setDestination();
-   
+               
                this.PF._findPath();
             }
          })
-      }
+      // }
       if (this.mode === 'raycast') {
          this.mPosition = { x: 0, y: 0 };
          this.canvas.addEventListener('mousemove', e => {
@@ -79,13 +78,15 @@ class GameCanvas extends Component {
             this.mPosition.y = e.clientY;
          })
 
-         this.raySource = utils._getRandomGridBox(this.gridHash);
-
-         let heroDestination = utils._getRandomGridBox(this.gridHash);
-         heroDestination._setDestination();
-         this.PF._findPath();
+         // let raySource = utils._getRandomGridBox(this.gridHash);
+         
+         // setTimeout(() => {
+         //    let heroDestination = utils._getRandomGridBox(this.gridHash);
+         //    heroDestination._setDestination();
+         //    this.PF._findPath()
+         // }, 2000);
       }
-
+      
       window.addEventListener('keypress', e => {
          if (e.key === 'p') {
             if (this.isPaused) {
@@ -116,15 +117,49 @@ class GameCanvas extends Component {
       this._drawGrid();
       this._drawBox('hero', this.hero);
 
-      this._drawRay({ x: this.hero.x + 25, y: this.hero.y + 25 })
+      if (this.mode === 'raycast') this._drawRay({ x: this.hero.x + 25, y: this.hero.y + 25 })
    }
 
-   _drawRay = () => {
-      this.ctx.fillStyle = '#FF0000';
+   _drawRay = coords => {
+      let radians = Math.atan2(this.mPosition.y - coords.y, this.mPosition.x - coords.x);
+      let r = 1100;
+
+      this.ctx.strokeStyle = '#FF0000';
       this.ctx.beginPath();
-      this.ctx.moveTo(this.raySource.x + 25, this.raySource.y + 25);
+      this.ctx.moveTo(coords.x, coords.y);
       this.ctx.lineTo(this.mPosition.x, this.mPosition.y);
+      // this.ctx.lineTo(((this.mPosition.x + r) * Math.cos(radians)), ((this.mPosition.y + r) * Math.sin(radians)));
       this.ctx.stroke();
+
+      this._detectCollisions(radians);
+   }
+
+   _detectCollisions = radians => {
+      this.hitBoxes = [];
+      
+      for (let i = 1; i < 1111; i += 15) {
+         let currX = ((this.hero.x + i) * Math.cos(radians));
+         let currY = ((this.hero.y + i) * Math.sin(radians))
+         let gCoords = { x: (Math.ceil(currX / 50) - 1) + this.heroPosition.gX, y: (Math.ceil(currY / 50) - 1) + this.heroPosition.gY };
+
+         if (gCoords.x < this.heroPosition.gX) {
+            this.hitBoxes.push(`${gCoords.x + 1}-${gCoords.y}`);
+            this.hitBoxes.push(`${gCoords.x + 2}-${gCoords.y}`);
+         } else if (gCoords.x > this.heroPosition.gX) {
+            this.hitBoxes.push(`${gCoords.x - 1}-${gCoords.y}`)
+            this.hitBoxes.push(`${gCoords.x - 2}-${gCoords.y}`);
+         } else {
+            this.hitBoxes.push(`${gCoords.x}-${gCoords.y}`)
+         }
+
+         if (gCoords.x > 15 || gCoords.y > 11) break;
+      }
+
+      this.hitBoxes = this.hitBoxes.filter((c, i, a) => a.indexOf(c) === i);
+      for (let key in this.gridHash) this.gridHash[key]._resetSprite();
+      this.hitBoxes.forEach(key => this.gridHash[key] ? this.gridHash[key]._setNeighborState() : null);
+      console.log(this.hitBoxes)
+      
    }
 
    // function to draw individual game objects to the canvas
@@ -163,7 +198,6 @@ class GameCanvas extends Component {
       let height = t_height / rows;
       let gridHash = {};
 
-      let startAssigned = false;
       for (let i = 0; i <= rows - 1; i++) {
          for (let j = 0; j <= cols - 1; j++) {
             let key = `${j}-${i}`,
@@ -174,10 +208,9 @@ class GameCanvas extends Component {
 
             let gridBox = new this.Classes.GridBox({ key, gX, gY, x, y, width, height, ...gridTypeConfig });
 
-            if (!startAssigned && (utils._randInt(1, 20) > 15) && gridBox.type === 'walkable') {
-               this.heroPosition = gridBox;
+            if (!this.heroPosition && (utils._randInt(1, 20) > 15) && gridBox.type === 'walkable') {
                gridBox._setSource();
-               startAssigned = true;
+               this.heroPosition = gridBox;
             }
 
             gridHash[key] = gridBox;

@@ -15,6 +15,7 @@ export default ({ game, utils }) => ({
       this.color = color;
       this.sprite = sprite;
       this.origSprite = Object.assign({}, sprite);
+      this._resetSprite = () => this.sprite = this.origSprite;
 
       this.gScore = 0;
       this.hScore = 0;
@@ -43,6 +44,9 @@ export default ({ game, utils }) => ({
          delete game.heroPosition;
       }
 
+      this.isRaySource = false;
+      this._setRaySource = () => this.isRaySource = true;
+
       this.isDestination = false;
       this.isNextDestination = false;
       this._setNextDestination = () => this.isNextDestination = true;
@@ -69,8 +73,8 @@ export default ({ game, utils }) => ({
             for (let j = gY - 1; j <= gY + 1; j++) {
                if ((i < 0 || j < 0 || i > 15 || j > 11) || (i === this.gX && j === this.gY)) { nPosition++; continue; }
                else {
-                  if (nPosition === 0 || nPosition === 2 || nPosition === 6 || nPosition === 8) { nPosition++; continue; };
                   let neighbor = game.gridHash[`${i}-${j}`];
+                  if (nPosition === 0 || nPosition === 2 || nPosition === 6 || nPosition === 8) { nPosition++; continue; };
                   neighbor.direction = utils.nDirections[nPosition]
                   neighbors.push(neighbor);
                   nPosition++;

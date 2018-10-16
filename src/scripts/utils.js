@@ -5,7 +5,8 @@ class Utils {
       let destBox = null;
 
       for (let key in grid) {
-         if (this._randInt(0, 100) > 95) destBox = grid[key];
+         console.log(key)
+         if (this._randInt(0, 100) > 70) destBox = grid[key];
       }
 
       if (!destBox) return this._getRandomGridBox();
@@ -82,8 +83,19 @@ class Utils {
                }
             }
          }
+      },
+      turret: {
+         turretTypes: {
+            0: {
+               type: 'gunner',
+               const: 0,
+               width: 50,
+               height: 50,
+               sprite: { x: 0, y: 0, width: 100, height: 50 }
+            }
+         }
       }
    }
 }
 
-export default new Utils
+export default new Utils();

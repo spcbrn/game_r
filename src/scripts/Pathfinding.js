@@ -3,17 +3,19 @@ export default ({ game, utils }) => {
       _findPath = () => {
          if (this.allDone) game._resetGrid();
          console.log('starting path')
-         
+         console.log(game.heroPosition)
+         console.log(game.heroDestination)
+
          game.findingPath = true;
-   
+
          this.allDone = false;
          this._iterations = 0;
          this._nextNearest = null;
-   
+
          this.opened = [];
          this.closed = [];
          this.path = {};
-         
+
          this.opened.push(game.heroPosition);
 
          this._iteratePath();
@@ -22,35 +24,41 @@ export default ({ game, utils }) => {
       _finishPath = () => {
          game.heroDestination._setNextSource();
          game.findingPath = false;
-         
+
          this.allDone = true;
 
          console.log('completed path')
 
-         if (game.mode === 'raycast') {
-            let nextDestination = utils._getRandomGridBox(game.gridHash);
-            nextDestination._setNextDestination();
-            console.log(nextDestination)
-            this._findPath();
-         }
+         // if (game.mode === 'raycast') {
+         //    const findNext = () => {
+         //       let nextDestination = utils._getRandomGridBox(game.gridHash);
+         //       if (nextDestination.key !== game.heroDestination.key) nextDestination._setNextDestination();
+         //       else findNext();
+         //    }
+
+         //    setTimeout(() => {
+         //       findNext();
+         //       this._findPath()
+         //    }, 3000);
+         // }
       }
 
       _iteratePath = async () => {
-         if (this.allDone) return;      
+         if (this.allDone) return;
 
          let lowestScore = -1;
          let neighbors;
-         
+
          // wait 300ms between each iteration
          await utils._prt(300)
-   
+
          this.opened.forEach(box => {
             if (lowestScore === -1 || box.fScore < lowestScore) {
                lowestScore = box.fScore;
                this._nextNearest = box;
             }
          })
-   
+
          if (game.heroTweenA) game._tweenHero(this._nextNearest);
          if (this._nextNearest.isDestination) {
             this._finishPath();
@@ -62,20 +70,20 @@ export default ({ game, utils }) => {
                this.closed.push(inOpened);
                this.path[inOpened.key] = inOpened;
             }
-            
+
             neighbors = this._nextNearest._getNeighbors();
             neighbors.forEach(box => {
-               if (box.type !== 'blocked'  && box.type !== 'ff' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
+               if (box.type !== 'blocked' && !box.isSource && !this.closed.find(c => c.key === box.key)) {
                   if (!this.opened.find(c => c.key === box.key)) {
                      this.opened.push(box);
-   
+
                      if (game.showPath) {
-                           box._setNeighborState();
-                           this._nextNearest._setNearestState();
+                        box._setNeighborState();
+                        this._nextNearest._setNearestState();
                      }
-                     
+
                      box.parentZone = this._nextNearest;
-                     
+
                      box.gScore = (box.parentZone.gScore || 0) + this._calcGScore(box);
                      box.hScore = this._calcHScore(box);
                      box.fScore = this._calcFScore(box);
@@ -102,7 +110,7 @@ export default ({ game, utils }) => {
       _calcGScore = box => {
          let { direction, type } = box;
          let score = 0;
-         
+
          switch (direction) {
             case 'NORTH':
             case 'SOUTH':
@@ -120,11 +128,11 @@ export default ({ game, utils }) => {
                break;
          }
 
-         if (type === 'walkableSlow') score += 15;
-         if (type === 'damage') score += 25;
-         
+         if (type === 'walkableSlow') score += 20;
+         if (type === 'damage') score += 40;
+
          return score;
       };
    }
-   return new PathFinder;
+   return new PathFinder();
 }
