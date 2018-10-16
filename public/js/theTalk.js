@@ -134,14 +134,13 @@ function startHeartBeat()
                     {
                         if(returnObj.data.state.state != currentState.type || returnObj.data.state.idx != currentState.idx)
                         {
+                            hideLeaderBoard();
                             loadTemplate(returnObj.data.state.state,returnObj.data.state.idx);
                         }
                     }
 
-
                     if(returnObj.data.hasOwnProperty('session') && returnObj.data.session.hasOwnProperty('name'))
                     {
-                        console.log(" SET NAME "+name);
                         Cookies.set('name',returnObj.data.session.name);
                     }
 
@@ -174,22 +173,51 @@ function showLeaderBoard()
 {
     console.log(" --- showLeaderBoard()");
     $("#menuContainer").show();
+
+
+    $.ajax({
+        type: "POST",
+        url: "https://wwwforms.suralink.com/utahjs.php",
+        data: {
+            secret: 'utahJs',
+            command: 'getScoreBoard',
+            myId: myId,
+            name: name,
+        },
+        success: function(data) 
+        {
+            var returnObj = $.parseJSON(data);
+            if(returnObj.success)
+            {
+                $("#scoreBoardList").empty();
+
+                $("#scoreBoardList").append('<li class="title">Score Board</li><li>&nbsp;</li>');
+
+                for(var i in returnObj.data)
+                {
+                    $("#scoreBoardList").append('<li class="player">'+returnObj.data[i].name+':'+returnObj.data[i].score+'</li>');
+                }
+                
+                console.log(" OMG leader board : ",returnObj);
+            }
+            else if(returnObj.error) { showErrorMessage(returnObj.msg); }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { if(XMLHttpRequest.status != 0) alert('error : heart beat. '+textStatus); }
+    });
+
 }
 
 function hideLeaderBoard()
 {
-    console.log(" --- hideLeaderBoard()");
     $("#menuContainer").hide();
 }
 
 function showJobs()
 {
-    console.log(" --- showJobs()");
     $("#jobContainer").show();
 }
 
 function hideJobs()
 {
-    console.log(" --- hideJobs()");
     $("#jobContainer").hide();
 }

@@ -36,6 +36,8 @@
 </div>
 <script>
         $("#playerName").html(Cookies.get('name'));
+        parent.showLeaderBoard();
+        // parent.showJobs();
 </script>
 </body>
 </html>

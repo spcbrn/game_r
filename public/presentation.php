@@ -34,21 +34,8 @@
         <div id="talkWrapper">
             <div id="theTalk">
                 <div id="menuContainer" style="display:none;"><div id="theMenu">
-                    <ul class="menuList">
-                        <li class="countDown">Game will begin in</li>
-                        <li id="countDownTime" class="countDown"><li>
-                        <li>&nbsp;</li>
-                        <li class="title">Score Board</li>
-                        <li class="player">Player 1 : 0</li>
-                        <li class="player">Player 2 : 0</li>
-                        <li class="player">Player 3 : 0</li>
-                        <li class="player">Player 4 : 0</li>
-                        <li class="player">Player 5 : 0</li>
-                        <li class="player">Player 6 : 0</li>
-                        <li class="player">Player 7 : 0</li>
-                        <li class="player">Player 8 : 0</li>
-                        <li class="player">Player 9 : 0</li>
-                        <li class="player">Player 10 : 0</li>
+                    <ul class="menuList" id="scoreBoardList">
+                        
                     </ul>
                 </div></div>
                 <div id="jobContainer" style="display:none;"><div id="theJob">
