@@ -1,7 +1,7 @@
 # Game Design using HTML Canvas and React
 
 
-This project is designed to accompany a talk and demonstrate the basic principles of game development using canvas and react.
+A simple project to demonstrate the 2D game development fundamentals of <b>pathfinding</b> and <b>ray tracing</b> using React for the application interface and Canvas for the renderer.
 
 ## Table of Contents
 
