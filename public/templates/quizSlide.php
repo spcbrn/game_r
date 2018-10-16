@@ -36,7 +36,7 @@
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td class="question">What rhymes with chimes?</td>
+                        <td class="question">Which of the following is more massive?</td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
@@ -47,7 +47,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 1</td>
+                                <td class="answerTxt">A supermasive black hole</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
@@ -63,7 +63,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 2</td>
+                                <td class="answerTxt">All matter in the observable universe</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
@@ -79,7 +79,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 3</td>
+                                <td class="answerTxt">node_modules</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
@@ -94,10 +94,10 @@
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td class="question">Who dat be dat?</td>
+                        <td class="question">What is the name of this machine?</td>
                     </tr>
                     <tr>
-                        <td>&nbsp;</td>
+                        <td><img src="../slide_art/c64.jpg" width="400px" height="auto"/></td>
                     </tr>
                     <tr>
                         <td><hr/></td>
@@ -105,7 +105,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 1</td>
+                                <td class="answerTxt">Commodore 64</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
@@ -121,7 +121,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 2</td>
+                                <td class="answerTxt">IBM PCJr</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
@@ -137,7 +137,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 3</td>
+                                <td class="answerTxt">Apple IIe</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
@@ -152,7 +152,7 @@
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td class="question">Where in the world is carmen?</td>
+                        <td class="question">What was the first international packet-based network called?</td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
@@ -163,7 +163,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 1</td>
+                                <td class="answerTxt">INTERNET</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
@@ -179,7 +179,7 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 2</td>
+                                <td class="answerTxt">ARPANET</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
@@ -195,7 +195,65 @@
                     <tr>
                         <td><table>
                             <tr>
-                                <td class="answerTxt">Blah blah blah 3</td>
+                                <td class="answerTxt">INTRANET</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+               <?php } else if($_GET['idx'] == 4) { ?>
+                  <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="question">What is the name of this robot?</td>
+                    </tr>
+                    <tr>
+                        <td><img src="../slide_art/shakey.jpg" style="margin: auto;" /></td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Wall-E</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">T1000</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Shakey</td>
                             </tr>
                             <tr>
                                 <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>

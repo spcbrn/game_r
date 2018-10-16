@@ -6,7 +6,7 @@ class GameInterface extends Component {
    render() {
       return (
          <div style={{ width: '800px', height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <GameCanvas mode='raycast' />
+            <GameCanvas mode='pathfind' />
          </div>
       );
    }
