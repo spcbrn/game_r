@@ -24,7 +24,11 @@
     </tr>
     <tr>
         <td><img src="../art/level_mid_left.png" /></td>
-        <td width="800" height="600">THE GAME </td>
+        <td width="800" height="600" style="position: relative;">
+            <span style="margin: 0; position: absolute; top: 0px; left: 0px; width: 800px; height: 600px" >
+               <iframe src="http://localhost:3001" width='100%' height="100%"></iframe>
+           </span>
+         </td>
         <td><img src="../art/level_mid_right.png" /></td>
     </tr>
     <tr>
