@@ -5,7 +5,7 @@ A simple project to demonstrate the 2D game development fundamentals of <b>pathf
 
 ## Table of Contents
 
-* [Pathfinding Demo](#live_demo)
+* [A* Demo](#live*demo)
 * [Installation](#installation)
 * [Usage](#usage)
 
