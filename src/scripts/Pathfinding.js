@@ -3,8 +3,6 @@ export default ({ game, utils }) => {
       _findPath = () => {
          if (this.allDone) game._resetGrid();
          console.log('starting path')
-         console.log(game.heroPosition)
-         console.log(game.heroDestination)
 
          game.findingPath = true;
 
