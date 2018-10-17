@@ -41,7 +41,8 @@ class GameCanvas extends Component {
       if (this.mode === 'pathfind') {
          this.showPath = true;
          this.showScore = true;
-         this.heroTweenA = true;
+         this.excludeDiagonals = true;
+         this.tweenHeroWithAlgorithm = true;
       }
       
       this._initializeGameCanvas();
@@ -112,7 +113,7 @@ class GameCanvas extends Component {
    }
 
    // recursively draw each grid object
-   _drawGrid = () => Object.values(this.gridHash).forEach(box => this._drawBox('grid', box))
+   _drawGrid = () => { for (let coord in this.gridHash) this._drawBox('grid', this.gridHash[coord]) }
 
    // function to draw individual game objects to the canvas
    _drawBox = (type, box) => {

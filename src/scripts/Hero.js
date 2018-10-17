@@ -12,7 +12,7 @@ export default ({ game, utils, TWEEN }) => {
          let tween;
          if (destination_box) {
             tween = new TWEEN.Tween(hero).to({ x: destination_box.x, y: destination_box.y }, 360);
-            hero._setDirection(destination_box.direction);
+            hero._setSpriteDirection(destination_box.direction);
             return tween.start();
          }
       }
