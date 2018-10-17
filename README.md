@@ -11,7 +11,7 @@ A simple project to demonstrate the 2D game development fundamentals of <b>pathf
 
 ## Live A* Demo
 
-    #https://spcbrn.github.io/game_r
+    [https://spcbrn.github.io/game_r](https://spcbrn.github.io/game_r)
 
 
 ## Installation
