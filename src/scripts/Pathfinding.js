@@ -13,7 +13,6 @@ export default ({ game, utils }) => {
 
          this.openList = {};
          this.closedList = {};
-         this.path = {};
 
          this.openList[game.heroPosition.key] = game.heroPosition;
 
