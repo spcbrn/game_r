@@ -122,7 +122,7 @@ class GameCanvas extends Component {
 
    _drawRay = coords => {
       let radians = Math.atan2(this.mPosition.y - coords.y, this.mPosition.x - coords.x);
-      let r = 1100;
+      // let r = 1100;
 
       this.ctx.strokeStyle = '#FF0000';
       this.ctx.beginPath();
