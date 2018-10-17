@@ -20,5 +20,5 @@ This is the working directory.
 
 #### Branches:
 * master - Game base with A* pathfinding.
-* raycast - Game base with unfinished raycasting.
+* raycast - Game base with A* and unfinished raycasting logic.
 
