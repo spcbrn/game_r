@@ -11,7 +11,7 @@ A simple project to demonstrate the 2D game development fundamentals of <b>pathf
 
 ## Live A* Demo
 
-    [https://spcbrn.github.io/game_r](https://spcbrn.github.io/game_r)
+[https://spcbrn.github.io/game_r](https://spcbrn.github.io/game_r)
 
 
 ## Installation
@@ -21,9 +21,9 @@ A simple project to demonstrate the 2D game development fundamentals of <b>pathf
 
 ## Usage
 
-    This is the working directory.
+This is the working directory.
 
 #### Branches:
-    * master - Game base with A* pathfinding.
-    * raycast - Game base with A* and unfinished raycasting logic.
+* master - Game base with A* pathfinding.
+* raycast - Game base with A* and unfinished raycasting logic.
 
