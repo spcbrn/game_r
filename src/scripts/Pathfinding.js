@@ -1,6 +1,7 @@
 export default ({ game, utils }) => {
    class PathFinder {
       _findPath = () => {
+         // if not first pathfinding movement, reset the grid
          if (this.allDone) game.Scripts.Grid._resetGrid();
          console.log('starting path')
 
@@ -29,7 +30,7 @@ export default ({ game, utils }) => {
       }
 
       _iteratePath = async () => {
-         if (this.allDone) return;
+         if (this.allDone) return this._finishPath();
 
          let lowestScore = -1;
          let neighbors;

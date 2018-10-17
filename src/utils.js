@@ -3,18 +3,11 @@ class Utils {
    _randInt = (a, b) => Math.floor(Math.random() * (b - a) + a);
    _getRandomGridBox = grid => {
       let destBox = null;
-
-      for (let key in grid) {
-         console.log(key)
-         if (this._randInt(0, 100) > 70) destBox = grid[key];
-      }
-
-      if (!destBox) return this._getRandomGridBox();
-      
-      return destBox
+      for (let key in grid) if (this._randInt(0, 100) > 70) destBox = grid[key];
+      return destBox ? destBox : this._getRandomGridBox(grid);
    }
    nDirections = { 0: 'NORTH_WEST', 1: 'WEST', 2: 'SOUTH_WEST', 3: 'NORTH', 5: 'SOUTH', 6: 'NORTH_EAST', 7: 'EAST', 8: 'SOUTH_EAST' };
-   config = {
+   boxConfig = {
       grid: {
          _getRandomTypeConstant: () => ([0, 0, 2, 0, 2, 2, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 2, 0, 0][(Math.floor(Math.random() * (20 - 1)) + 1)]),
          gridTypes: {

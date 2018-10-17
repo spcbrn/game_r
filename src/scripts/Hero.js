@@ -4,7 +4,7 @@ export default ({ game, utils, TWEEN }) => {
          grid_position._setSource();
 
          let { x, y } = grid_position;
-         let heroConfig = utils.config.char.charTypes[0];
+         let heroConfig = utils.boxConfig.char.charTypes[0];
          return new game.Classes.CharBox({ x, y, sprite: heroConfig.spriteSet.down, ...heroConfig })
       }
 

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import utils from './../scripts/utils.js';
+import utils from '../utils.js';
+
 import GameClasses from './../GameClasses.js';
 import Grid from './../scripts/Grid.js';
 import Hero from './../scripts/Hero.js';
@@ -34,7 +35,9 @@ class GameCanvas extends Component {
    /* ------------- REACT LIFECYCLE ------------- */
    
    componentWillMount = () => {
-      this.mode = this.props.mode || 'pathfind'
+      this.mode = this.props.mode || 'pathfind';
+      this.cWidth = this.props.width || 800;
+      this.cHeight = this.props.height || 600;
    }
    
    componentDidMount = () => {
@@ -55,18 +58,18 @@ class GameCanvas extends Component {
       this.canvas = this.refs.g_canvas;
       this.ctx = this.canvas.getContext('2d');
 
-      // instantiate level grid objects to be draw into canvas
+      /* instantiate level grid objects to be draw into canvas */
       this.gridHash = this.Scripts.Grid._initNewGrid({
          rows: 12,
          cols: 16,
-         t_width: 800,
-         t_height: 600
+         t_width: this.cWidth,
+         t_height: this.cHeight
       
       });
-      // instantiate hero object
+      /* instantiate hero object */
       this.hero = this.Scripts.Hero._initNewHero(this.heroPosition);
       
-      // handle user input/interactions
+      /* handle user input/interactions */
       this.canvas.addEventListener('click', e => {
          let gCoords = { x: (Math.ceil(e.clientX / 50) - 1), y: (Math.ceil(e.clientY / 50) - 1) };
          let gridKey = `${gCoords.x}-${gCoords.y}`;
@@ -94,28 +97,28 @@ class GameCanvas extends Component {
          }
       })
 
-      // commence render loop
+      /* commence render loop */
       this._renderLoop();
    }
 
-   // recursively redraw canvas using requestAnimationFrame, and pass each render timestamp into our TWEEN engine
+   /* recursively redraw canvas using requestAnimationFrame, and pass each render timestamp into our TWEEN engine */
    _renderLoop = _ts => {
       this._drawRender();
       TWEEN.update(_ts || 0);
       this.frameId = requestAnimationFrame(this._renderLoop);
    }
 
-   // clear canvas and redraw all objects according to new state
+   /* clear canvas and redraw all objects according to new state */
    _drawRender = () => {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this._drawGrid();
       this._drawBox('hero', this.hero);
    }
 
-   // recursively draw each grid object
+   /* recursively draw each grid object */
    _drawGrid = () => { for (let coord in this.gridHash) this._drawBox('grid', this.gridHash[coord]) }
 
-   // function to draw individual game objects to the canvas
+   /* function to draw individual game objects to the canvas */
    _drawBox = (type, box) => {
       if (!box) return;
 
@@ -148,8 +151,8 @@ class GameCanvas extends Component {
          <canvas
             id="g_canvas"
             ref="g_canvas"
-            width={this.props.width}
-            height={this.props.height}
+            width={this.cWidth}
+            height={this.cHeight}
          />
       </>);
    }
