@@ -46,6 +46,12 @@ class GameCanvas extends Component {
          this.showScore = true;
          this.excludeDiagonals = true;
          this.tweenHeroWithAlgorithm = true;
+      } else if (this.mode === 'raycast') {
+         this.showPath = false;
+         this.showScore = false;
+         this.excludeDiagonals = true;
+         this.tweenHeroWithAlgorithm = true;
+         this.clickToMoveHero = false;
       }
       
       this._initializeGameCanvas();
@@ -69,20 +75,38 @@ class GameCanvas extends Component {
       /* instantiate hero object */
       this.hero = this.Scripts.Hero._initNewHero(this.heroPosition);
       
-      /* handle user input/interactions */
-      this.canvas.addEventListener('click', e => {
-         let gCoords = { x: (Math.ceil(e.clientX / 50) - 1), y: (Math.ceil(e.clientY / 50) - 1) };
-         let gridKey = `${gCoords.x}-${gCoords.y}`;
-         let boxClicked = this.gridHash[gridKey];
-         
-         if (boxClicked.type !== 'walkable') return;
-         if (!this.findingPath) {
-            if (this.heroDestination && (this.heroDestination.key !== boxClicked.key)) boxClicked._setNextDestination();
-            else boxClicked._setDestination();
+      if (this.mode === 'pathfind' || this.clickToMoveHero) {
+         /* handle user input/interactions */
+         this.canvas.addEventListener('click', e => {
+            let gCoords = { x: (Math.ceil(e.clientX / 50) - 1), y: (Math.ceil(e.clientY / 50) - 1) };
+            let gridKey = `${gCoords.x}-${gCoords.y}`;
+            let boxClicked = this.gridHash[gridKey];
             
-            this.Scripts.PF._findPath();
-         }
-      })
+            if (boxClicked.type !== 'walkable') return;
+            if (!this.findingPath) {
+               if (this.heroDestination && (this.heroDestination.key !== boxClicked.key)) boxClicked._setNextDestination();
+               else boxClicked._setDestination();
+               
+               this.Scripts.PF._findPath();
+            }
+         })
+      }
+
+      if (this.mode === 'raycast') {
+         this.mPosition = { x: 0, y: 0 };
+         this.canvas.addEventListener('mousemove', e => {
+            this.mPosition.x = e.clientX;
+            this.mPosition.y = e.clientY;
+         })
+
+         // let raySource = utils._getRandomGridBox(this.gridHash);
+         
+         // setTimeout(() => {
+         //    let heroDestination = utils._getRandomGridBox(this.gridHash);
+         //    heroDestination._setDestination();
+         //    this.Scripts.PF._findPath()
+         // }, 2000);
+      }
       
       window.addEventListener('keypress', e => {
          if (e.key === 'p') {
@@ -113,6 +137,8 @@ class GameCanvas extends Component {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this._drawGrid();
       this._drawBox('hero', this.hero);
+
+      if (this.mode === 'raycast') this._drawRayStroke({ x: this.hero.x + 25, y: this.hero.y + 25 })
    }
 
    /* recursively draw each grid object */
@@ -143,6 +169,47 @@ class GameCanvas extends Component {
          default:
             return;
       }
+   }
+
+   _drawRayStroke = coords => {
+      let radians = Math.atan2(this.mPosition.y - coords.y, this.mPosition.x - coords.x);
+      // let r = 1100;
+
+      this.ctx.strokeStyle = '#FF0000';
+      this.ctx.beginPath();
+      this.ctx.moveTo(coords.x, coords.y);
+      this.ctx.lineTo(this.mPosition.x, this.mPosition.y);
+      // this.ctx.lineTo(((this.mPosition.x + r) * Math.cos(radians)), ((this.mPosition.y + r) * Math.sin(radians)));
+      this.ctx.stroke();
+
+      this._detectBroadPhaseCollisions(radians);
+   }
+
+   _detectBroadPhaseCollisions = radians => {
+      this.hitBoxes = [];
+      
+      for (let i = 1; i < 1111; i += 15) {
+         let currX = ((this.hero.x + i) * Math.cos(radians));
+         let currY = ((this.hero.y + i) * Math.sin(radians))
+         let gCoords = { x: (Math.ceil(currX / 50) - 1) + this.heroPosition.gX, y: (Math.ceil(currY / 50) - 1) + this.heroPosition.gY };
+
+         if (gCoords.x < this.heroPosition.gX) {
+            this.hitBoxes.push(`${gCoords.x + 1}-${gCoords.y}`);
+            this.hitBoxes.push(`${gCoords.x + 2}-${gCoords.y}`);
+         } else if (gCoords.x > this.heroPosition.gX) {
+            this.hitBoxes.push(`${gCoords.x - 1}-${gCoords.y}`)
+            this.hitBoxes.push(`${gCoords.x - 2}-${gCoords.y}`);
+         } else {
+            this.hitBoxes.push(`${gCoords.x}-${gCoords.y}`)
+         }
+
+         if (gCoords.x > 15 || gCoords.y > 11) break;
+      }
+
+      this.hitBoxes = this.hitBoxes.filter((c, i, a) => a.indexOf(c) === i);
+      for (let key in this.gridHash) this.gridHash[key]._resetSprite();
+      this.hitBoxes.forEach(key => this.gridHash[key] ? this.gridHash[key]._setNeighborState() : null);
+      console.log(this.hitBoxes)
    }
    
 

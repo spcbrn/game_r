@@ -8,7 +8,7 @@ class GameInterface extends Component {
       let canvasProps = {
          width: 800,
          height: 600,
-         mode: 'pathfind'
+         mode: 'raycast'
       }
 
       return (
