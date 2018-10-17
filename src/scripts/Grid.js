@@ -13,7 +13,7 @@ export default ({ game, utils }) => {
                   gX = X, gY = Y,
                   x = (X * width),
                   y = (Y * height),
-                  gridTypeConfig = utils.config.grid.gridTypes[utils.config.grid._getRandomTypeConstant()];
+                  gridTypeConfig = utils.boxConfig.grid.gridTypes[utils.boxConfig.grid._getRandomTypeConstant()];
    
                let gridBox = new game.Classes.GridBox({ key, gX, gY, x, y, width, height, ...gridTypeConfig });
    

@@ -1,18 +1,18 @@
 export default ({ game, utils }) => {
    class PathFinder {
       _findPath = () => {
+         /* if not first pathfinding movement, reset the grid */
          if (this.allDone) game.Scripts.Grid._resetGrid();
          console.log('starting path')
 
          game.findingPath = true;
 
          this.allDone = false;
-         this._iterations = 0;
-         this._nextNearest = null;
+         this.iterations = 0;
+         this.nextNearest = null;
 
          this.openList = {};
          this.closedList = {};
-         this.path = {};
 
          this.openList[game.heroPosition.key] = game.heroPosition;
 
@@ -29,36 +29,36 @@ export default ({ game, utils }) => {
       }
 
       _iteratePath = async () => {
-         if (this.allDone) return;
+         if (this.allDone) return this._finishPath();
 
          let lowestScore = -1;
          let neighbors;
 
-         // wait 300ms between each iteration
+         /* wait 300ms between each iteration */
          await utils._prt(300)
 
          for (let key in this.openList) {
             if (lowestScore === -1 || this.openList[key].fScore < lowestScore) {
                lowestScore = this.openList[key].fScore;
-               this._nextNearest = this.openList[key];
+               this.nextNearest = this.openList[key];
             }
          }
 
-         if (game.tweenHeroWithAlgorithm) game.Scripts.Hero._tween(game.hero, this._nextNearest);
+         if (game.tweenHeroWithAlgorithm) game.Scripts.Hero._tween(game.hero, this.nextNearest);
 
-         if (this._nextNearest.isDestination) {
+         if (this.nextNearest.isDestination) {
             this._finishPath();
             return;
          } else {
-            let nextInOpened = this.openList[this._nextNearest.key] || false;
+            let nextInOpened = this.openList[this.nextNearest.key] || false;
             
             if (nextInOpened) {
-               let nextKey = this._nextNearest.key;
+               let nextKey = this.nextNearest.key;
                delete this.openList[nextKey];
                this.closedList[nextKey] = nextInOpened;
             }
 
-            neighbors = this._nextNearest._getNeighbors();
+            neighbors = this.nextNearest._getNeighbors();
             neighbors.forEach(box => {
                if (box.type !== 'blocked' && !box.isSource && !this.closedList[box.key]) {
                   if (!this.openList[box.key]) {
@@ -66,28 +66,28 @@ export default ({ game, utils }) => {
 
                      if (game.showPath) {
                         box._setNeighborState();
-                        this._nextNearest._setNearestState();
+                        this.nextNearest._setNearestState();
                      }
 
-                     box.parentZone = this._nextNearest;
+                     box.parentZone = this.nextNearest;
 
                      box.gScore = (box.parentZone.gScore || 0) + this._calcGScore(box);
                      box.hScore = this._calcHScore(box);
                      box.fScore = this._calcFScore(box);
                   } else {
-                     if (this._nextNearest.gScore + this._calcGScore(box) < box.gScore) {
-                        box.parentZone = this._nextNearest;
-                        box.gScore = this._nextNearest.gScore + this._calcGScore(box);
+                     if (this.nextNearest.gScore + this._calcGScore(box) < box.gScore) {
+                        box.parentZone = this.nextNearest;
+                        box.gScore = this.nextNearest.gScore + this._calcGScore(box);
                         box.fScore = this._calcFScore(box);
                      }
                   }
                }
                game.gridHash[box.key].gScore = box.gScore;
             })
-            if (!Object.keys(this.openList).length || this._iterations > 800) {
+            if (!Object.keys(this.openList).length || this.iterations > 800) {
                this.allDone = true;
             }
-            this._iterations++;
+            this.iterations++;
             if (!this.allDone) this._iteratePath();
          }
       }
