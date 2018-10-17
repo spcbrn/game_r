@@ -17,3 +17,8 @@ A simple project to demonstrate the 2D game development fundamentals of <b>pathf
 ## Usage
 
 This is the working directory.
+
+#### Branches:
+* master - Game base with A* pathfinding.
+* raycast - Game base with unfinished raycasting.
+

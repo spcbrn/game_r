@@ -69,12 +69,15 @@ export default ({ game, utils }) => ({
          let neighbors = [];
          let nPosition = 0;
          
-         for (let i = gX - 1; i <= gX + 1; i++) {
-            for (let j = gY - 1; j <= gY + 1; j++) {
-               if ((i < 0 || j < 0 || i > 15 || j > 11) || (i === this.gX && j === this.gY)) { nPosition++; continue; }
+         for (let x_coord = gX - 1; x_coord <= gX + 1; x_coord++) {
+            for (let y_coord = gY - 1; y_coord <= gY + 1; y_coord++) {
+               if ((x_coord < 0 || y_coord < 0 || x_coord > 15 || y_coord > 11) || (x_coord === this.gX && y_coord === this.gY)) { nPosition++; continue; }
                else {
-                  let neighbor = game.gridHash[`${i}-${j}`];
-                  if (nPosition === 0 || nPosition === 2 || nPosition === 6 || nPosition === 8) { nPosition++; continue; };
+                  let neighbor = game.gridHash[`${x_coord}-${y_coord}`];
+
+                  // this line will exclude diagonal neighbors
+                  if (game.excludeDiagonals && (nPosition === 0 || nPosition === 2 || nPosition === 6 || nPosition === 8)) { nPosition++; continue; };
+
                   neighbor.direction = utils.nDirections[nPosition]
                   neighbors.push(neighbor);
                   nPosition++;
@@ -95,8 +98,17 @@ export default ({ game, utils }) => ({
       this.sprite = sprite;
       this.spriteSet = spriteSet;
 
-      this._setDirection = dir => {
-         let transDir = { NORTH: 'up', SOUTH: 'down', EAST: 'right', WEST: 'left' };
+      this._setSpriteDirection = dir => {
+         let transDir = {
+            NORTH: 'up',
+            NORTH_WEST: 'up',
+            NORTH_EAST: 'up',
+            SOUTH: 'down',
+            SOUTH_WEST: 'down',
+            SOUTH_EAST: 'down',
+            EAST: 'right',
+            WEST: 'left'
+         };
          this.sprite = this.spriteSet[transDir[dir || 'SOUTH']];
       }
    }
