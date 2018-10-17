@@ -3,6 +3,7 @@ export default ({ game, utils }) => {
       _findPath = () => {
          /* if not first pathfinding movement, reset the grid */
          if (this.allDone) game.Scripts.Grid._resetGrid();
+         
          console.log('starting path')
 
          game.findingPath = true;
@@ -46,10 +47,8 @@ export default ({ game, utils }) => {
 
          if (game.tweenHeroWithAlgorithm) game.Scripts.Hero._tween(game.hero, this.nextNearest);
 
-         if (this.nextNearest.isDestination) {
-            this._finishPath();
-            return;
-         } else {
+         if (this.nextNearest.isDestination) return this._finishPath();
+         else {
             let nextInOpened = this.openList[this.nextNearest.key] || false;
             
             if (nextInOpened) {
