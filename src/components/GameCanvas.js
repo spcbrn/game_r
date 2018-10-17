@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 
 import utils from './../scripts/utils.js';
 import GameClasses from './../GameClasses.js';
+import Grid from './../scripts/Grid.js';
+import Hero from './../scripts/Hero.js';
 import Pathfinder from '../scripts/Pathfinding.js';
 
 const TWEEN = require('@tweenjs/tween.js');
@@ -12,48 +14,56 @@ gridSprites.src = require('./../art/spritesheet.png');
 const heroSprites = new Image();
 heroSprites.src = require('./../art/theDude.png');
 
-const turretSprites = new Image();
-turretSprites.src = require('./../art/TurretR.png');
+
 
 class GameCanvas extends Component {
    constructor() {
       super()
 
-      this.PF = Pathfinder({ game: this, utils });
       this.Classes = GameClasses({ game: this, utils })
+      this.Scripts = {
+         Grid: Grid({ game: this, utils }),
+         Hero: Hero({ game: this, utils, TWEEN }),
+         PF: Pathfinder({ game: this, utils })
+      }
       
       this.isPaused = false;
-      this.mode = null;
    }
 
+
+   /* ------------- REACT LIFECYCLE ------------- */
+   
    componentWillMount = () => {
       this.mode = this.props.mode || 'pathfind'
    }
-
+   
    componentDidMount = () => {
       if (this.mode === 'pathfind') {
          this.showPath = true;
          this.showScore = true;
          this.heroTweenA = true;
       }
-      if (this.mode === 'raycast') {
-         this.showPath = false;
-         this.showScore = false;
-         this.heroTweenA = true;
-      }
-
+      
       this._initializeGameCanvas();
    }
+   
 
+   /* ----------------- CANVAS ------------------ */
 
    _initializeGameCanvas = () => {
       this.canvas = this.refs.g_canvas;
       this.ctx = this.canvas.getContext('2d');
 
       // instantiate level grid objects to be draw into canvas
-      this.gridHash = this._initGrid({ rows: 12, cols: 16, t_width: 800, t_height: 600 });
+      this.gridHash = this.Scripts.Grid._initNewGrid({
+         rows: 12,
+         cols: 16,
+         t_width: 800,
+         t_height: 600
+      
+      });
       // instantiate hero object
-      this.hero = this._initHero();
+      this.hero = this.Scripts.Hero._initNewHero(this.heroPosition);
       
       // handle user input/interactions
       this.canvas.addEventListener('click', e => {
@@ -66,7 +76,7 @@ class GameCanvas extends Component {
             if (this.heroDestination && (this.heroDestination.key !== boxClicked.key)) boxClicked._setNextDestination();
             else boxClicked._setDestination();
             
-            this.PF._findPath();
+            this.Scripts.PF._findPath();
          }
       })
       
@@ -87,10 +97,10 @@ class GameCanvas extends Component {
       this._renderLoop();
    }
 
-   // recursively redraw canvas using requestAnimationFrame
+   // recursively redraw canvas using requestAnimationFrame, and pass each render timestamp into our TWEEN engine
    _renderLoop = _ts => {
       this._drawRender();
-      TWEEN.update(_ts);
+      TWEEN.update(_ts || 0);
       this.frameId = requestAnimationFrame(this._renderLoop);
    }
 
@@ -100,6 +110,9 @@ class GameCanvas extends Component {
       this._drawGrid();
       this._drawBox('hero', this.hero);
    }
+
+   // recursively draw each grid object
+   _drawGrid = () => Object.values(this.gridHash).forEach(box => this._drawBox('grid', box))
 
    // function to draw individual game objects to the canvas
    _drawBox = (type, box) => {
@@ -127,91 +140,15 @@ class GameCanvas extends Component {
             return;
       }
    }
-
-   // recursively draw each grid object
-   _drawGrid = () => Object.values(this.gridHash).forEach(box => this._drawBox('grid', box))
-
-   // instantiate set of grid objects, randomly assigning a type
-   _initGrid = ({ rows, cols, t_width, t_height }) => {
-      let width = t_width / cols;
-      let height = t_height / rows;
-      let gridHash = {};
-
-      for (let i = 0; i <= rows - 1; i++) {
-         for (let j = 0; j <= cols - 1; j++) {
-            let key = `${j}-${i}`,
-               gX = j, gY = i,
-               x = (j * width),
-               y = (i * height),
-               gridTypeConfig = utils.config.grid.gridTypes[utils.config.grid._getRandomTypeConstant()];
-
-            let gridBox = new this.Classes.GridBox({ key, gX, gY, x, y, width, height, ...gridTypeConfig });
-
-            if (!this.heroPosition && (utils._randInt(1, 20) > 15) && gridBox.type === 'walkable') {
-               gridBox._setSource();
-               this.heroPosition = gridBox;
-            }
-
-            gridHash[key] = gridBox;
-         }
-      }
-
-      return gridHash;
-   }
-
-   // reset all grid objects to their default sprite, score and state values, then re-assign the source and destination objects respectively
-   _resetGrid = () => {
-      let nextSrc, nextDest;
-      console.log('resetting')
-
-      for (let coords in this.gridHash) {
-         let box = this.gridHash[coords];
-
-         if (box.isNextSource) nextSrc = box;
-         if (box.isNextDestination) nextDest = box;
-
-         box.sprite = box.origSprite;
-         box.gScore = 0;
-         box.hScore = 0;
-         box.fScore = 0;
-         box._deselect();
-         box._clearParent();
-         box._clearDestination();
-         box._clearSource();
-      }
-
-      delete this.heroPosition;
-      delete this.heroDestination
-
-      nextSrc._setSource()
-      nextDest._setDestination();
-   }
-
-   // instantiate hero object
-   _initHero = () => {
-      let { x, y } = this.heroPosition;
-      let heroConfig = utils.config.char.charTypes[0];
-      return new this.Classes.CharBox({ x, y, sprite: heroConfig.spriteSet.down, ...heroConfig })
-   }
-
-   // use tween function to draw hero's movement
-   _tweenHero = (destBox, path) => {
-      let tween;
-
-      if (destBox) {
-         tween = new TWEEN.Tween(this.hero).to({ x: destBox.x, y: destBox.y }, 360);
-         this.hero._setDirection(destBox.direction);
-         return tween.start();
-      }
-   }
+   
 
    render() {
       return (<>
          <canvas
             id="g_canvas"
             ref="g_canvas"
-            width="800"
-            height="600"
+            width={this.props.width}
+            height={this.props.height}
          />
       </>);
    }

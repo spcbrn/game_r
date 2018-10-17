@@ -1,7 +1,7 @@
 export default ({ game, utils }) => {
    class PathFinder {
       _findPath = () => {
-         if (this.allDone) game._resetGrid();
+         if (this.allDone) game.Scripts.Grid._resetGrid();
          console.log('starting path')
 
          game.findingPath = true;
@@ -26,19 +26,6 @@ export default ({ game, utils }) => {
          this.allDone = true;
 
          console.log('completed path')
-
-         // if (game.mode === 'raycast') {
-         //    const findNext = () => {
-         //       let nextDestination = utils._getRandomGridBox(game.gridHash);
-         //       if (nextDestination.key !== game.heroDestination.key) nextDestination._setNextDestination();
-         //       else findNext();
-         //    }
-
-         //    setTimeout(() => {
-         //       findNext();
-         //       this._findPath()
-         //    }, 3000);
-         // }
       }
 
       _iteratePath = async () => {
@@ -57,7 +44,7 @@ export default ({ game, utils }) => {
             }
          })
 
-         if (game.heroTweenA) game._tweenHero(this._nextNearest);
+         if (game.heroTweenA) game.Scripts.Hero._tween(game.hero, this._nextNearest);
          if (this._nextNearest.isDestination) {
             this._finishPath();
             return;
