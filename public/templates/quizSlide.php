@@ -263,9 +263,357 @@
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
+                    <?php } else if($_GET['idx'] == 5) { ?>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="question">What year was A* proposed?</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">1968</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">2013</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">1955</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <?php } else if($_GET['idx'] == 6) { ?>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="question"> Who created JavaScript?</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Netscape</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Oracle</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Linus Trrivaldus</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <?php } else if($_GET['idx'] == 7) { ?>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="question">Which of the following is not a reserved word in JavaScript?</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">finally</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">throw</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">undefined</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <?php } else if($_GET['idx'] == 8) { ?>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="question">What is the name of the hero in the video game zelda?</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Zelda</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Link</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Trogdor</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <?php } else if($_GET['idx'] == 9) { ?>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="question">Which cult TV show from the 1990's, featuring David Duchovny and Gillian Anderson, was resurrected in 2016?</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Bambi</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">The Matrix</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">The X-Files.</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <?php } else if($_GET['idx'] == 10) { ?>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="question">In which city where the 2016 summer Olympics held?</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Salt Lake City</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(1);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Rio, Brazil.</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(2);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><hr/></td>
+                    </tr>
+                    <tr>
+                        <td><table>
+                            <tr>
+                                <td class="answerTxt">Russia</td>
+                            </tr>
+                            <tr>
+                                <td class="answerButton"><a class="buttonLarge" href="Javascript: selectAnswer(3);">Select Answer</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
                 <?php } else { ?>
                     <tr>
-                        <td>what what a</td>
+                        <td></td>
                     </tr>
                 <?php } ?>
             </table></td>

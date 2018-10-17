@@ -11,6 +11,27 @@
                         height:1024px;
                         overflow:hidden;
                     }
+
+
+.menuList li.title
+{
+    font-size: 64px;
+    color: #fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #ff0080, 0 0 30px #ff0080, 0 0 40px #ff0080, 0 0 55px #ff0080, 0 0 75px #ff0080;
+    cursor: pointer;
+    font-family: 'Futura','Press Start 2P', cursive;
+}
+
+.menuList li.player
+{
+    font-size: 46px;
+    color: rgba(81, 255, 13, .95);
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-weight: bold;
+    padding-left: 12px;
+}
+
             </style>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
