@@ -18,8 +18,8 @@ heroSprites.src = require('./../art/theDude.png');
 
 
 class GameCanvas extends Component {
-   constructor() {
-      super()
+   constructor(props) {
+      super(props)
 
       this.Classes = GameClasses({ game: this, utils })
       this.Scripts = {
@@ -28,17 +28,14 @@ class GameCanvas extends Component {
          PF: Pathfinder({ game: this, utils })
       }
       
+      this.mode = this.props.mode || 'pathfind';
+      this.cWidth = this.props.width || 800;
+      this.cHeight = this.props.height || 600;
       this.isPaused = false;
    }
 
 
    /* ------------- REACT LIFECYCLE ------------- */
-   
-   componentWillMount = () => {
-      this.mode = this.props.mode || 'pathfind';
-      this.cWidth = this.props.width || 800;
-      this.cHeight = this.props.height || 600;
-   }
    
    componentDidMount = () => {
       if (this.mode === 'pathfind') {
