@@ -61,38 +61,43 @@ class GameCanvas extends Component {
          cols: 16,
          t_width: this.cWidth,
          t_height: this.cHeight
-      
       });
       /* instantiate hero object */
       this.hero = this.Scripts.Hero._initNewHero(this.heroPosition);
       
       /* handle user input/interactions */
-      this.canvas.addEventListener('click', e => {
-         let gCoords = { x: (Math.ceil(e.clientX / 50) - 1), y: (Math.ceil(e.clientY / 50) - 1) };
-         let gridKey = `${gCoords.x}-${gCoords.y}`;
-         let boxClicked = this.gridHash[gridKey];
-         
-         if (boxClicked.type !== 'walkable') return;
-         if (!this.findingPath) {
-            if (this.heroDestination && (this.heroDestination.key !== boxClicked.key)) boxClicked._setNextDestination();
-            else boxClicked._setDestination();
+      this.canvas.addEventListener(
+         'click',
+         e => {
+            let gCoords = { x: (Math.ceil(e.clientX / 50) - 1), y: (Math.ceil(e.clientY / 50) - 1) };
+            let gridKey = `${gCoords.x}-${gCoords.y}`;
+            let boxClicked = this.gridHash[gridKey];
             
-            this.Scripts.PF._findPath();
+            if (boxClicked.type !== 'walkable') return;
+            if (!this.findingPath) {
+               if (this.heroDestination && (this.heroDestination.key !== boxClicked.key)) boxClicked._setNextDestination();
+               else boxClicked._setDestination();
+               
+               this.Scripts.PF._findPath();
+            }
          }
-      })
+      )
       
-      window.addEventListener('keypress', e => {
-         if (e.key === 'p') {
-            if (this.isPaused) {
-               this.isPaused = false;
-               this._renderLoop();
-            }
-            else {
-               this.isPaused = true;
-               cancelAnimationFrame(this.frameId);
+      window.addEventListener(
+         'keypress',
+         e => {
+            if (e.key === 'p') {
+               if (this.isPaused) {
+                  this.isPaused = false;
+                  this._renderLoop();
+               }
+               else {
+                  this.isPaused = true;
+                  cancelAnimationFrame(this.frameId);
+               }
             }
          }
-      })
+      )
 
       /* commence render loop */
       this._renderLoop();
